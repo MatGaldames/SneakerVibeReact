@@ -1,0 +1,144 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.img-logo{
+    width: 200px;
+}
+
+.card-max {
+  max-width: 20rem;
+  background-color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+.neon-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0 transparent;
+}
+
+.neon-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow:
+    0 0 10px rgba(255, 0, 85, 0.6),
+    0 0 20px rgba(255, 0, 85, 0.4),
+    0 0 30px rgba(255, 0, 85, 0.3);
+}
+
+.neon-card img {
+  transition: transform 0.4s ease;
+}
+
+.neon-card:hover img {
+  transform: scale(1.05);
+}
+
+
+a.text-reset:hover {
+  text-decoration: none !important;
+}
+
+.size-img-prod{
+  height: 600px;
+}
+
+.altura{
+  height: 100%;
+}
+
+.marginr{
+  margin-right: 5px ;
+}
+
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.navbar-nav .nav-link {
+  font-weight: 500;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #dc3545;
+}
+
+@media (max-width: 991.98px) {
+  .navbar-nav {
+    flex-direction: column !important;
+    align-items: center;
+  }
+
+  .navbar .btn {
+    width: 80%;
+  }
+}
+
+/* --- Cards de Productos --- */
+.card-product {
+  width: 20rem;
+  min-height: 32rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-product img {
+  object-fit: cover;
+  height: 300px;
+  transition: transform 0.4s ease;
+}
+
+.neon-product {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0 transparent;
+}
+
+.neon-product:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow:
+    0 0 10px rgba(255, 0, 85, 0.6),
+    0 0 20px rgba(255, 0, 85, 0.4),
+    0 0 30px rgba(255, 0, 85, 0.3);
+}
+
+.neon-product:hover img {
+  transform: scale(1.05);
+}
+
+/* Focus con glow sutil rojo */
+.form-control:focus {
+  border-color: #ff2a55;
+  box-shadow: 0 0 0 .2rem rgba(255, 42, 85, .25);
+}
+
+.blog-card {
+  margin-bottom: 4rem;
+}
+
+.blog-title {
+  color: #222;
+  transition: color 0.3s ease;
+}
+
+.blog-title:hover {
+  color: #ff2a55;
+}
+
+.blog-card img {
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.blog-card img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 42, 85, 0.3);
+}
