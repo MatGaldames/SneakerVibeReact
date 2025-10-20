@@ -1,7 +1,30 @@
 // src/Contacto.jsx
-import React from "react";
+import React, { useState } from "react";
+import { checkName, checkMaxLength } from "./assets/validaciones/formScripts";
 
 export default function Contacto({ bgUrl = "/assets/img/auth-bg.jpg" }) {
+  const [form, setForm] = useState({
+    nombre: '',
+    mensaje: '',
+  });
+
+  const [error, setError] = useState({
+    nombre: '',
+    mensaje: '',
+  });
+
+  const handleName = (e) => {
+    const name = e.target.value;
+    form.nombre = name;
+    error.nombre = checkName(name);
+  };
+
+  const handleMsg = (e) => {
+    const msg = e.target.value;
+    form.mensaje = msg;
+    error.mensaje = checkMaxLength(msg);
+  };
+
   return (
     <main
       className="d-flex flex-column justify-content-center align-items-center min-vh-100"
@@ -25,10 +48,13 @@ export default function Contacto({ bgUrl = "/assets/img/auth-bg.jpg" }) {
                   <input
                     type="text"
                     id="nombre"
+                    value={nombre}
+                    onChange={handleName}
                     className="form-control"
                     placeholder="Tu nombre"
                     required
                   />
+                  {error.nombre && <p style={{ color: 'red' }}>{error.nombre}</p>}
                 </div>
 
                 <div className="mb-3">
@@ -51,10 +77,13 @@ export default function Contacto({ bgUrl = "/assets/img/auth-bg.jpg" }) {
                   <input
                     type="text"
                     id="asunto"
+                    value={nombre}
+                    onChange={handleName}
                     className="form-control"
                     placeholder="Motivo de tu mensaje"
                     required
                   />
+                  {error.mensaje && <p style={{ color: 'red' }}>{error.mensaje}</p>}
                 </div>
 
                 <div className="mb-3">
