@@ -4,6 +4,8 @@ import App from "./App";
 import Home from "./Home";
 import Login from "./Login";
 import Registro from "./Registro";
+import ProductDetail from "./ProductDetail";
+import CategoriaDetalle from "./CategoriaDetalle";
 
 // (estas páginas las iremos creando después)
 import Productos from "./Productos";
@@ -22,6 +24,8 @@ export default function Router() {
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
           <Route path="contacto" element={<Contacto />} />
+          <Route path="/product" element={<ProductDetail />} />
+          <Route path="/categoria" element={<CategoriaDetalle />} />
           <Route path="blog" element={<Blog />} />
         </Route>
       </Routes>

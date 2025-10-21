@@ -37,26 +37,26 @@ export default function Home() {
       </div>
 
       <div className="container-fluid my-5">
-  <div className="row justify-content-around w-100 mx-0">
-    {categorias.map((c) => (
-      <div
-        key={c.id}
-        className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 d-flex justify-content-center"
-      >
-        <div className="card card-max neon-card text-center">
-          <img
-            src={c.imgSrc}
-            className="card-img-top rounded"
-            alt={c.altText}
-          />
-          <div className="card-body">
-            <h5 className="card-title">{c.titulo}</h5>
-          </div>
+        <div className="row justify-content-around w-100 mx-0">
+          {categorias.map((c) => (
+            <div
+              key={c.id}
+              className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 d-flex justify-content-center"
+            >
+              <div className="card card-max neon-card text-center">
+                <img
+                  src={c.imgSrc}
+                  className="card-img-top rounded"
+                  alt={c.altText}
+                />
+                <div className="card-body">
+                  <h5 className="card-title">{c.titulo}</h5>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-    ))}
-  </div>
-</div>
 
 
     </main>
