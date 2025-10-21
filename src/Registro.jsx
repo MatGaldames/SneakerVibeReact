@@ -24,7 +24,7 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
 
               <form>
                 <div className="mb-3">
-                  <label htmlFor="nombre" className="form-label fw-semibold">
+                  <label htmlFor="RegNombre" className="form-label fw-semibold">
                     Nombre completo
                   </label>
                   <input
@@ -37,7 +37,7 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
                 </div>
 
                 <div className="mb-3">
-                  <label htmlFor="correo" className="form-label fw-semibold">
+                  <label htmlFor="RegCorreo" className="form-label fw-semibold">
                     Correo electrónico
                   </label>
                   <input
@@ -50,7 +50,7 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
                 </div>
 
                 <div className="mb-3">
-                  <label htmlFor="password" className="form-label fw-semibold">
+                  <label htmlFor="RegPassword" className="form-label fw-semibold">
                     Contraseña
                   </label>
                   <input
@@ -64,7 +64,7 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
 
                 <div className="mb-3">
                   <label
-                    htmlFor="confirmPassword"
+                    htmlFor="RegConfirmPassword"
                     className="form-label fw-semibold"
                   >
                     Confirmar contraseña
