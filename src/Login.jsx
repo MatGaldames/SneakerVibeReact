@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { validarLogin } from "./assets/validaciones/login"; // ajusta la ruta si tu Login.jsx está en otra carpeta
+import { validarLogin } from "./assets/validaciones/login.js";
+
 
 export default function Login({ bgUrl = "/assets/img/auth-bg.jpg" }) {
   const [form, setForm] = useState({ correo: "", password: "" });
@@ -15,12 +16,13 @@ export default function Login({ bgUrl = "/assets/img/auth-bg.jpg" }) {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); 
-    const val = validarLogin(form);
-    setErrores(val);
+  e.preventDefault();
+  const val = validarLogin(form);
+  setErrores(val);
+  if (Object.keys(val).length === 0) {
+  }
+};
 
-    
-  };
 
   return (
     <main

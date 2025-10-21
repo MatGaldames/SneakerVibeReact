@@ -1,26 +1,23 @@
-// src/utils/validacionesLogin.js
-
-// Acepta sólo estos dominios exactos:
-//  - @duoc.cl
-//  - @duoc.profesor.cl
-//  - @gmail.com
 const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@(duoc\.cl|duoc\.profesor\.cl|gmail\.com)$/;
 
 export function validarLogin({ correo, password }) {
   const errores = {};
 
-  // Correo
-  if (!correo || !correo.trim()) {
+  const correoNorm = (correo ?? "").trim();
+  const passNorm = (password ?? "");
+
+  if (!correoNorm) {
     errores.correo = "El correo es obligatorio.";
-  } else if (!EMAIL_REGEX.test(correo.trim())) {
+  } else if (!EMAIL_REGEX.test(correoNorm)) {
     errores.correo =
-      "Sólo se permiten correos @duoc.cl, @duoc.profesor.cl o @gmail.com.";
+      "Formato inválido o dominio no permitido (usa @duoc.cl, @duoc.profesor.cl o @gmail.com).";
   }
 
-  // Password: 5 a 10
-  const len = (password || "").length;
-  if (!len) {
+  const len = passNorm.length;
+  if (len === 0) {
     errores.password = "La contraseña es obligatoria.";
+  } else if (/\s/.test(passNorm)) {
+    errores.password = "La contraseña no debe contener espacios.";
   } else if (len < 5) {
     errores.password = "Debe tener al menos 5 caracteres.";
   } else if (len > 10) {
@@ -30,5 +27,4 @@ export function validarLogin({ correo, password }) {
   return errores;
 }
 
-// Export default opcional por si prefieres import por defecto
 export default validarLogin;
