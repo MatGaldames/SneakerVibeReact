@@ -1,7 +1,7 @@
 // src/Home.jsx
 import React from "react";
 import categorias from "./data/categorias";
-import CategoriaCard from "./CategoriaCard";
+
 
 export default function Home() {
   return (
@@ -43,20 +43,29 @@ export default function Home() {
               key={c.id}
               className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 d-flex justify-content-center"
             >
-              <div className="card card-max neon-card text-center">
-                <img
-                  src={c.imgSrc}
-                  className="card-img-top rounded"
-                  alt={c.altText}
-                />
-                <div className="card-body">
-                  <h5 className="card-title">{c.titulo}</h5>
+              {/* Toda la card es clickeable */}
+              <a
+                href={`/categoria?nombre=${encodeURIComponent(
+                  (c.titulo || c.nombre).toLowerCase()
+                )}`}
+                className="text-decoration-none text-reset w-100 d-flex justify-content-center"
+              >
+                <div className="card card-max neon-card text-center w-100 h-100">
+                  <img
+                    src={c.imgSrc}
+                    className="card-img-top rounded"
+                    alt={c.altText}
+                  />
+                  <div className="card-body d-flex flex-column justify-content-center">
+                    <h5 className="card-title">{c.titulo}</h5>
+                  </div>
                 </div>
-              </div>
+              </a>
             </div>
           ))}
         </div>
       </div>
+
 
 
     </main>
