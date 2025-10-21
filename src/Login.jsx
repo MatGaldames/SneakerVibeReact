@@ -16,12 +16,12 @@ export default function Login({ bgUrl = "/assets/img/auth-bg.jpg" }) {
   };
 
   const handleSubmit = (e) => {
-  e.preventDefault();
-  const val = validarLogin(form);
-  setErrores(val);
-  if (Object.keys(val).length === 0) {
-  }
-};
+    e.preventDefault();
+    const val = validarLogin(form);
+    setErrores(val);
+    if (Object.keys(val).length === 0) {
+    }
+  };
 
 
   return (
