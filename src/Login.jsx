@@ -13,16 +13,6 @@ export default function Login({ bgUrl = "/assets/img/auth-bg.jpg" }) {
         position: "relative",
       }}
     >
-      {/* Overlay para oscurecer un poco el fondo */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.35))",
-        }}
-      />
 
       {/* Contenido */}
       <div className="container position-relative">
