@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { validarContacto } from "./assets/validaciones/contactanos.js";
+import { validarContacto } from "../assets/validaciones/contactanos";
 
 export default function Contacto({ bgUrl = "/assets/img/auth-bg.jpg" }) {
   const [form, setForm] = useState({ nombre: "", correo: "", asunto: "", mensaje: "" });

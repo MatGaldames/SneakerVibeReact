@@ -1,6 +1,6 @@
 // src/Home.jsx
 import React from "react";
-import categorias from "./data/categorias";
+import categorias from "../data/categorias";
 
 
 export default function Home() {
@@ -65,9 +65,6 @@ export default function Home() {
           ))}
         </div>
       </div>
-
-
-
     </main>
   );
 }

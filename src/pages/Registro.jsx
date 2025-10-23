@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { validarRegistro } from "./assets/validaciones/registro.js";
+import { validarRegistro } from "../assets/validaciones/registro";
 
 export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
   const [form, setForm] = useState({ nombre: "", correo: "", password: "", confirmPassword: "" });

@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import productos from "./data/productos";
+import productos from "../data/productos";
 
 export default function CategoriaDetalle() {
   const location = useLocation();

@@ -1,14 +1,25 @@
 import React, { useState } from "react";
-import { validarLogin } from "./assets/validaciones/login.js";
+import { validarLogin } from "../assets/validaciones/login";
+import { autenticarConArray } from "../utilidades/autenticacion";
+import { Link, useNavigate } from "react-router-dom";
+
 
 
 export default function Login({ bgUrl = "/assets/img/auth-bg.jpg" }) {
   const [form, setForm] = useState({ correo: "", password: "" });
   const [errores, setErrores] = useState({});
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { id, value } = e.target;
     setForm((s) => ({ ...s, [id]: value }));
+
+    if (errores.general) {
+      setErrores((prev) => {
+        const { general, ...resto } = prev;
+        return resto;
+      });
+    }
   };
 
   const handleBlur = () => {
@@ -19,8 +30,18 @@ export default function Login({ bgUrl = "/assets/img/auth-bg.jpg" }) {
     e.preventDefault();
     const val = validarLogin(form);
     setErrores(val);
-    if (Object.keys(val).length === 0) {
+    if (Object.keys(val).length > 0) return;
+
+    const { ok, error } = autenticarConArray({
+      correo: form.correo,
+      password: form.password,
+    });
+    if (!ok) {
+      setErrores((prev) => ({ ...prev, general: error || "No se pudo iniciar sesión." }));
+      return;
     }
+
+    navigate("/", { replace: true });
   };
 
 
@@ -94,6 +115,9 @@ export default function Login({ bgUrl = "/assets/img/auth-bg.jpg" }) {
                 <button type="submit" className="btn btn-danger w-100 mb-3">
                   Iniciar sesión
                 </button>
+                {errores.general && (
+                  <div className="text-danger small mb-3">{errores.general}</div>
+                )}
 
                 <div className="text-center">
                   <small>

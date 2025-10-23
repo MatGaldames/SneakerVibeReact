@@ -1,5 +1,5 @@
 import React from "react";
-import productos from "./data/productos";
+import productos from "../data/productos";
 
 export default function Productos() {
   return (

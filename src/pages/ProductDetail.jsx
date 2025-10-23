@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import productos from "./data/productos";
+import productos from "../data/productos";
 
 export default function ProductDetail() {
     const location = useLocation();
@@ -22,7 +22,6 @@ export default function ProductDetail() {
         <main className="container-fluid py-5">
             <div className="container py-5">
                 <div className="row align-items-center">
-                    {/* Imagen */}
                     <div className="col-12 col-lg-6 text-center mb-4 mb-lg-0">
                         <img
                             src={producto.imgSrc}
@@ -31,7 +30,6 @@ export default function ProductDetail() {
                         />
                     </div>
 
-                    {/* Descripción */}
                     <div className="col-12 col-lg-6">
                         <h2 className="fw-bold">{producto.titulo}</h2>
                         <p>{producto.descripcion}</p>
@@ -39,7 +37,6 @@ export default function ProductDetail() {
                             ${producto.precio.toLocaleString("es-CL")}
                         </h4>
 
-                        {/* Selección de talla */}
                         <label htmlFor="talla" className="fw-semibold">
                             Selecciona tu talla
                         </label>
@@ -49,7 +46,7 @@ export default function ProductDetail() {
                                     <option key={i}>
                                         {t.eu
                                             ? `EU ${t.eu} (US ${t.us})`
-                                            : `Talla ${t}`} {/* Soporta arrays simples o con objetos */}
+                                            : `Talla ${t}`}
                                     </option>
                                 ))}
                         </select>
@@ -58,7 +55,6 @@ export default function ProductDetail() {
                             Agregar al carrito
                         </button>
 
-                        {/* Tabla de tallas si existen */}
                         {producto.tallas[0]?.eu && (
                             <>
                                 <h5 className="fw-semibold mt-4">Tabla de Tallas</h5>
