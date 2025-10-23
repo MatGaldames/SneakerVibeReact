@@ -138,3 +138,111 @@ a.text-reset:hover {
   transform: scale(1.05);
   box-shadow: 0 0 20px rgba(255, 42, 85, 0.3);
 }
+
+/*css carrito*/
+
+/* === CARRITO (Carrito.jsx) === */
+
+/* Contenedor general */
+body.bg-white {
+  background-color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 42, 85, 0.3); 
+}
+
+/* Cards generales del carrito */
+.card {
+  border-radius: 18px;
+  transition: all 0.3s ease;
+}
+
+
+.card-body-car{
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 42, 85, 0.3);
+}
+/* Cards internas del carrito */
+.media {
+  transition: all 0.25s ease;
+}
+
+/* Botones */
+.btn-dark {
+  background-color: #212529;
+  border: none;
+  transition: all 0.25s ease;
+}
+
+.btn-dark:hover {
+  background-color: #dc3545;
+  transform: translateY(-1px);
+}
+
+.btn-outline-danger {
+  border-radius: 8px;
+  transition: all 0.25s ease;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+/* Campos de cantidad */
+.input-group .form-control {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.input-group .btn-outline-secondary {
+  color: #495057;
+  border-color: #dee2e6;
+  transition: all 0.2s ease;
+}
+
+.input-group .btn-outline-secondary:hover {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: #fff;
+}
+
+
+/* Resumen de compra */
+.card .d-flex span {
+  font-size: 0.95rem;
+}
+
+/* Espaciado del botón pagar */
+.btn-block {
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* Sombra general de las secciones */
+section.py-5 {
+  position: relative;
+  z-index: 1;
+}
+
+/* En pantallas pequeñas */
+@media (max-width: 767px) {
+  .media {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .media img {
+    margin-bottom: 10px;
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .input-group {
+    margin: 0 auto;
+  }
+
+  .btn-link.text-danger {
+    font-size: 0.9rem;
+  }
+}

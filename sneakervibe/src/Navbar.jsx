@@ -39,6 +39,10 @@ export default function Navbar() {
           <li className="nav-item">
             <a className="nav-link" href="/contacto.html">Contacto</a>
           </li>
+          <li className="nav-item">
+            <a className="nav-link" href="/contacto.html">Carritp</a>
+          </li>
+          
         </ul>
       </div>
     </nav>

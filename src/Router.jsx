@@ -11,6 +11,7 @@ import CategoriaDetalle from "./CategoriaDetalle";
 import Productos from "./Productos";
 import Contacto from "./Contacto";
 import Blog from "./Blog";
+import Carrito from "./Carrito";
 
 export default function Router() {
   return (
@@ -20,6 +21,7 @@ export default function Router() {
         <Route path="/" element={<App />}>
           {/* Rutas internas renderizadas dentro del <App /> */}
           <Route index element={<Home />} />
+          <Route path="/carrito" element={<Carrito />} />
           <Route path="productos" element={<Productos />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
@@ -32,3 +34,4 @@ export default function Router() {
     </BrowserRouter>
   );
 }
+
