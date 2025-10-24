@@ -63,7 +63,7 @@ export default function Navbar() {
               <span className="me-3">
                 Hola, <strong>{obtenerPrimerNombre(usuario.nombre)}</strong>
               </span>
-              <button type="button" className="btn btn-secondary" onClick={manejarCerrarSesion}>
+              <button type="button" className="btn btn-danger" onClick={manejarCerrarSesion}>
                 Cerrar sesión
               </button>
             </>

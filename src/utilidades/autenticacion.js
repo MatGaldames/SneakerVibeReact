@@ -2,6 +2,19 @@ import usuarios from "../data/usuarios";
 
 const CLAVE_SESION = "sv_usuario";
 
+const CLAVE_USUARIOS_EXTRA = "sv_usuarios_extra";
+
+function leerUsuariosExtra() {
+  const crudo = localStorage.getItem(CLAVE_USUARIOS_EXTRA);
+  if (!crudo) return [];
+  try {
+    const arr = JSON.parse(crudo);
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
+}
+
 function notificarCambioSesion() {
   window.dispatchEvent(new Event("sv_sesion_cambio"));
 }
@@ -32,8 +45,12 @@ export function autenticarConArray({ correo, password }) {
   const correoNorm = String(correo || "").trim().toLowerCase();
   const pass = String(password || "");
 
-  const usuario = usuarios.find(
-    (u) => u.correo.toLowerCase() === correoNorm && u.password === pass
+  // incluir usuarios registrados en LocalStorage
+  const usuariosExtra = leerUsuariosExtra();
+  const todos = [...usuarios, ...usuariosExtra];
+
+  const usuario = todos.find(
+    (u) => String(u.correo).toLowerCase() === correoNorm && String(u.password) === pass
   );
 
   if (!usuario) {

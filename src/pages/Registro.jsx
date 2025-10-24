@@ -1,22 +1,43 @@
 import React, { useState } from "react";
 import { validarRegistro } from "../assets/validaciones/registro";
+import { registrarUsuarioComun } from "../utilidades/registro";         // <-- NUEVO
+import { useNavigate, Link } from "react-router-dom";                    // <-- NUEVO
 
 export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
   const [form, setForm] = useState({ nombre: "", correo: "", password: "", confirmPassword: "" });
   const [errores, setErrores] = useState({});
+  const [mensajeGeneral, setMensajeGeneral] = useState("");              // <-- NUEVO
+  const navigate = useNavigate();                                        // <-- NUEVO
 
   const manejarCambio = (e) => {
     const { id, value } = e.target;
     setForm((prev) => ({ ...prev, [id]: value }));
+    if (mensajeGeneral) setMensajeGeneral("");                           // <-- limpia msg general al tipear
   };
+
   const manejarEnfocar = () => {
     setErrores(validarRegistro(form));
   };
+
   const manejarEnviar = (e) => {
     e.preventDefault();
     const val = validarRegistro(form);
     setErrores(val);
     if (Object.keys(val).length === 0) {
+      // Registrar (rol "comun", id auto user-XYZ) + auto-login
+      const { ok, error } = registrarUsuarioComun({
+        nombre: form.nombre,
+        correo: form.correo,
+        password: form.password,
+      }, { autoLogin: true });
+
+      if (!ok) {
+        setMensajeGeneral(error || "No se pudo completar el registro.");
+        return;
+      }
+
+      // Ir a Home: Navbar ya debería saludar
+      navigate("/", { replace: true });
     }
   };
 
@@ -118,16 +139,21 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
                   )}
                 </div>
 
-                <button type="submit" className="btn btn-danger w-100 mb-3">
+                <button type="submit" className="btn btn-danger w-100 mb-2">
                   Registrarme
                 </button>
+
+                {/* Mensaje general (duplicado de correo, etc.) */}
+                {mensajeGeneral && (
+                  <div className="text-danger small mb-3">{mensajeGeneral}</div>
+                )}
 
                 <div className="text-center">
                   <small>
                     ¿Ya tienes cuenta?{" "}
-                    <a href="/login" className="text-danger fw-semibold">
+                    <Link to="/login" className="text-danger fw-semibold">
                       Inicia sesión
-                    </a>
+                    </Link>
                   </small>
                 </div>
               </form>
