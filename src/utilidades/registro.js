@@ -53,8 +53,8 @@ function correoExiste(correo) {
 }
 
 // --- API principal ---
-export function registrarUsuarioComun({ nombre, correo, password }, { autoLogin = true } = {}) {
-  if (!nombre || !correo || !password) {
+export function registrarUsuarioComun({ nombre, correo, password, direccion, numeracion, region, comuna }, { autoLogin = true } = {}) {
+  if (!nombre || !correo || !password || !direccion || !numeracion || !region || !comuna) {
     return { ok: false, error: "Faltan datos obligatorios." };
   }
   if (correoExiste(correo)) {
@@ -67,6 +67,10 @@ export function registrarUsuarioComun({ nombre, correo, password }, { autoLogin 
     correo: normalizarCorreo(correo),
     password: String(password),  // demo: en prod se debe hashear
     rol: "comun",
+    direccion: String(direccion).trim(),
+    numeracion: String(numeracion).trim(),
+    region: String(region).trim(),
+    comuna: String(comuna).trim(),
   };
 
   const extra = leerUsuariosExtra();

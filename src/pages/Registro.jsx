@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { validarRegistro } from "../assets/validaciones/registro";
 import { registrarUsuarioComun } from "../utilidades/registro";         // <-- NUEVO
 import { useNavigate, Link } from "react-router-dom";                    // <-- NUEVO
+import { regionesYcomunas } from "../data/ubicaciones";                  // <-- NUEVO
 
 export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
   const [form, setForm] = useState({ nombre: "", correo: "", password: "", confirmPassword: "" });
@@ -29,6 +30,10 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
         nombre: form.nombre,
         correo: form.correo,
         password: form.password,
+        direccion: form.direccion,
+        numeracion: form.numeracion,
+        region: form.region,
+        comuna: form.comuna
       }, { autoLogin: true });
 
       if (!ok) {
@@ -138,6 +143,99 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
                     <div className="invalid-feedback">{errores.confirmPassword}</div>
                   )}
                 </div>
+
+                <div className="mb-3">
+                  <label htmlFor="RegDireccion"
+                    className={`form-label fw-semibold ${errores.direccion ? "is-invali" : ""}`}
+                  >
+                    Direccion
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="direccion"
+                    placeholder="Tu direccion"
+                    value={form.direccion}
+                    onChange={manejarCambio}
+                    onBlur={manejarEnfocar}
+                  /> {errores.direccion &&
+                    (<div className="invalid-feedback">{errores.direccion}
+                    </div>)}
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="RegNumeracion"
+                    className={`form-label fw-semibold ${errores.numeracion ? "is-invali" : ""}`}
+                  >
+                    Numero domicilio
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="numeracion"
+                    placeholder="# 1234"
+                    value={form.numeracion}
+                    onChange={manejarCambio}
+                    onBlur={manejarEnfocar}
+                  /> {errores.numeracion &&
+                    (<div className="invalid-feedback">{errores.numeracion}
+                    </div>)}
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="region" className="form-label fw-semibold">
+                    Región
+                  </label>
+                  <select
+                    id="region"
+                    className={`form-control ${errores.region ? "is-invalid" : ""}`}
+                    value={form.region}
+                    onChange={manejarCambio}
+                    onBlur={manejarEnfocar}
+                    required
+                  >
+                    <option value="">Selecciona una región</option>
+                    {Object.keys(regionesYcomunas).map((region) => (
+                      <option key={region} value={region}>
+                        {region}
+                      </option>
+                    ))}
+                  </select>
+                  {errores.region && (
+                    <div className="invalid-feedback">{errores.region}</div>
+                  )}
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="comuna" className="form-label fw-semibold">
+                    Comuna
+                  </label>
+                  <select
+                    id="comuna"
+                    className={`form-control ${errores.comuna ? "is-invalid" : ""}`}
+                    value={form.comuna}
+                    onChange={manejarCambio}
+                    onBlur={manejarEnfocar}
+                    disabled={!form.region} // Bloquea hasta elegir región
+                    required
+                  >
+                    <option value="">
+                      {form.region ? "Selecciona una comuna" : "Primero elige una región"}
+                    </option>
+                    {form.region &&
+                      regionesYcomunas[form.region].map((comuna) => (
+                        <option key={comuna} value={comuna}>
+                          {comuna}
+                        </option>
+                      ))}
+                  </select>
+                  {errores.comuna && (
+                    <div className="invalid-feedback">{errores.comuna}</div>
+                  )}
+                </div>
+
+
+
 
                 <button type="submit" className="btn btn-danger w-100 mb-2">
                   Registrarme
