@@ -9,6 +9,7 @@ import CategoriaDetalle from "./pages/CategoriaDetalle";
 import Productos from "./pages/Productos";
 import Contacto from "./pages/Contacto";
 import Blog from "./pages/Blog";
+import Carrito from "./pages/Carrito";
 
 export default function Router() {
   return (
@@ -22,6 +23,7 @@ export default function Router() {
           <Route path="contacto" element={<Contacto />} />
           <Route path="product" element={<ProductDetail />} />
           <Route path="categoria" element={<CategoriaDetalle />} />
+          <Route path="carrito" element={<Carrito />} />
           <Route path="blog" element={<Blog />} />
         </Route>
       </Routes>

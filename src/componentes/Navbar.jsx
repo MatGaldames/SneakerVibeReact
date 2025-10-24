@@ -55,6 +55,7 @@ export default function Navbar() {
           <li className="nav-item mx-2"><Link className="nav-link" to="/productos">Productos</Link></li>
           <li className="nav-item mx-2"><Link className="nav-link" to="/blog">Blog</Link></li>
           <li className="nav-item mx-2"><Link className="nav-link" to="/contacto">Contacto</Link></li>
+          <li className="nav-item mx-2"><Link className="nav-link" to="/carrito">Carrito</Link></li>
         </ul>
 
         <div className="d-flex align-items-center">

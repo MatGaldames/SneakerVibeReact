@@ -1,8 +1,11 @@
-import React from "react";
+import { useCarrito } from "../utilidades/useCarrito";
+import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import productos from "../data/productos";
 
 export default function ProductDetail() {
+    const { add } = useCarrito();
+    const [talla, setTalla] = useState(null);
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const productId = searchParams.get("id");
@@ -40,7 +43,7 @@ export default function ProductDetail() {
                         <label htmlFor="talla" className="fw-semibold">
                             Selecciona tu talla
                         </label>
-                        <select id="talla" className="form-select mb-4">
+                        <select id="talla" className="form-select mb-4" onChange={(e)=> setTalla(e.target.value)}>
                             {producto.tallas &&
                                 producto.tallas.map((t, i) => (
                                     <option key={i}>
@@ -51,7 +54,7 @@ export default function ProductDetail() {
                                 ))}
                         </select>
 
-                        <button className="btn btn-danger w-100 mb-3">
+                        <button className="btn btn-danger w-100 mb-3" onClick={()=> add({ ...producto, talla })}>
                             Agregar al carrito
                         </button>
 
