@@ -28,6 +28,7 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
       // Registrar (rol "comun", id auto user-XYZ) + auto-login
       const { ok, error } = registrarUsuarioComun({
         nombre: form.nombre,
+        apellido: form.apellido,
         correo: form.correo,
         password: form.password,
         direccion: form.direccion,
@@ -67,13 +68,13 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
               <form onSubmit={manejarEnviar} noValidate>
                 <div className="mb-3">
                   <label htmlFor="RegNombre" className="form-label fw-semibold">
-                    Nombre completo
+                    Nombres
                   </label>
                   <input
                     type="text"
                     className={`form-control ${errores.nombre ? "is-invalid" : ""}`}
                     id="nombre"
-                    placeholder="Tu nombre"
+                    placeholder="Nombres"
                     value={form.nombre}
                     onChange={manejarCambio}
                     onBlur={manejarEnfocar}
@@ -81,6 +82,25 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
                   />
                   {errores.nombre && (
                     <div className="invalid-feedback">{errores.nombre}</div>
+                  )}
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="RegApellido" className="form-label fw-semibold">
+                    Apellidos
+                  </label>
+                  <input
+                    type="text"
+                    className={`form-control ${errores.apellido ? "is-invalid" : ""}`}
+                    id="apellido"
+                    placeholder="Apellido"
+                    value={form.apellido}
+                    onChange={manejarCambio}
+                    onBlur={manejarEnfocar}
+                    required
+                  />
+                  {errores.apellido && (
+                    <div className="invalid-feedback">{errores.apellido}</div>
                   )}
                 </div>
 
@@ -233,8 +253,6 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
                     <div className="invalid-feedback">{errores.comuna}</div>
                   )}
                 </div>
-
-
 
 
                 <button type="submit" className="btn btn-danger w-100 mb-2">

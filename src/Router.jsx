@@ -11,6 +11,7 @@ import Contacto from "./pages/Contacto";
 import Blog from "./pages/Blog";
 import Carrito from "./pages/Carrito";
 import VistaAdmin from "./pages/vistaAdmin";
+import Envio from "./pages/Envio";
 
 export default function Router() {
   return (
@@ -26,7 +27,8 @@ export default function Router() {
           <Route path="categoria" element={<CategoriaDetalle />} />
           <Route path="carrito" element={<Carrito />} />
           <Route path="blog" element={<Blog />} />
-          <Route path="vistaAdmin" element={<VistaAdmin/>} />
+          <Route path="vistaAdmin" element={<VistaAdmin />} />
+          <Route path="envio" element={<Envio />} />
         </Route>
       </Routes>
     </BrowserRouter>
