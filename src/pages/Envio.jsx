@@ -4,6 +4,7 @@ import { getDatosClienteFromRegistro } from "../utilidades/checkoutPerfil.js";
 import { clp } from "../assets/hooks/currency.js";
 import { useCarrito } from "../utilidades/useCarrito.js";
 import productos from "../data/productos.js";
+import { saveOrder } from "../utilidades/orderStorage.js";
 
 function ValidacionTexto({ error }) {
     return error ? <div className="invalid-feedback d-block">{error}</div> : null;
@@ -84,29 +85,41 @@ export default function Envio() {
         setErr(v);
 
         if (Object.keys(v).length > 0) {
-            // ❌ Si hay errores de validación
-            setCompra("error");
+            setCompra({ status: "error" });
             return;
         }
 
-        // ✅ Todos los campos correctos
-        setCompra("ok");
-
-        // Genera número de orden (puedes mejorar este código luego)
+        // ✅ Todo válido: generamos la orden
         const orderNumber = new Date()
             .toISOString()
             .slice(0, 10)
             .replace(/-/g, "") + Math.floor(100 + Math.random() * 900);
         const orderCode = "ORDER" + Math.floor(10000 + Math.random() * 90000);
 
-        // Guarda por si recargan
-        localStorage.setItem("sv:lastOrder", JSON.stringify({ orderNumber, orderCode }));
+        const newOrder = {
+            id: orderNumber,
+            code: orderCode,
+            cliente: {
+                nombre: form.nombre,
+                apellidos: form.apellidos,
+                correo: form.correo,
+                region: form.region,
+                comuna: form.comuna,
+                direccion: `${form.calle} ${form.depto}`,
+            },
+            items,
+            total: resumen.total,
+            fecha: new Date().toLocaleString("es-CL"),
+        };
+
+        // Guarda la orden localmente
+        saveOrder(newOrder);
 
         // Limpia el carrito si quieres
         clear();
 
-        // Muestra los datos en consola (luego lo mandarás al backend)
-        console.log("Compra exitosa", { orderNumber, orderCode, form, items, total: resumen.total });
+        // Muestra el banner con los datos
+        setCompra({ status: "ok", orderNumber, orderCode });
     };
 
     const getThumb = (it) => {
@@ -117,7 +130,7 @@ export default function Envio() {
 
     return (
         <div className="container py-4">
-            {compra === "ok" && (
+            {compra?.status === "ok" && (
                 <div className="alert alert-success border-0 shadow-sm d-flex align-items-center justify-content-between mb-4">
                     <div className="d-flex align-items-center gap-2">
                         <span
@@ -127,15 +140,16 @@ export default function Envio() {
                             ✓
                         </span>
                         <div>
-                            <strong>Compra exitosa.</strong>{" "}
-                            <span className="text-muted">Gracias por tu compra 🎉</span>
+                            <strong>Se ha realizado la compra.</strong>{" "}
+                            <span className="text-muted">nro #{compra.orderNumber}</span>
+                            <div className="small text-muted">Código orden: <strong>{compra.orderCode}</strong></div>
                         </div>
                     </div>
                     <button type="button" className="btn-close" aria-label="Close" onClick={() => setCompra(null)}></button>
                 </div>
             )}
 
-            {compra === "error" && (
+            {compra?.status === "error" && (
                 <div className="alert alert-danger border-0 shadow-sm d-flex align-items-center justify-content-between mb-4">
                     <div className="d-flex align-items-center gap-2">
                         <span
