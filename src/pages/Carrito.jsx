@@ -2,14 +2,25 @@
 import React from "react";
 import { useCarrito } from "../utilidades/useCarrito";
 import { clp } from "../assets/hooks/currency";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Carrito() {
   const { items, resumen, inc, dec, setQty, remove, clear } = useCarrito();
+  const navigate = useNavigate();
+
+  const handlePagar = () => {
+    // Si no hay items, no hace nada (aunque ya está deshabilitado)
+    if (items.length === 0) return;
+
+    // Navega a la vista de Envío
+    navigate("/envio");
+  };
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-white">
 
-        {/* Mantiene tu estructura */}
+      {/* Mantiene tu estructura */}
       {/*<main className="container py-5 flex-grow-1"></main>*/}
 
       {/* Sección principal del carrito */}
@@ -148,9 +159,11 @@ export default function Carrito() {
                     <strong>{clp.format(resumen.total)}</strong>
                   </div>
 
+
                   <button
                     className="btn btn-danger btn-block mt-3"
                     disabled={items.length === 0}
+                    onClick={handlePagar}
                   >
                     Pagar
                   </button>
