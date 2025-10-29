@@ -11,7 +11,7 @@ import Contacto from "./pages/Contacto";
 import Blog from "./pages/Blog";
 import Carrito from "./pages/Carrito";
 import AgregarProductos from "./pages/agregarProducto";
-import homeAdmin from "./pages/homeAdmin";
+import HomeAdmin from "./pages/homeAdmin";
 import Envio from "./pages/Envio";
 import Ofertas from "./pages/Ofertas"
 
@@ -31,7 +31,7 @@ export default function Router() {
           <Route path="carrito" element={<Carrito />} />
           <Route path="blog" element={<Blog />} />
           <Route path="agregarProducto" element={<AgregarProductos />} />
-          <Route path="homeAdmin" element={< homeAdmin/>} />
+          <Route path="admin" element={<HomeAdmin />} />
           <Route path="envio" element={<Envio />} />
           <Route path="oferta" element={<Ofertas />}/>
         </Route>

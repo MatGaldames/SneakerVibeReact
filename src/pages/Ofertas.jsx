@@ -1,7 +1,6 @@
 import { useCarrito } from "../utilidades/useCarrito";
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
-import productos from "../data/ofertas";
 
 export default function ProductDetail() {
     const { add } = useCarrito();
