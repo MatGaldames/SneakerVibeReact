@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function VistaAdmin() {
+export default function AgregarProductos() {
   return (
     <main className="flex-grow-1 bg-light min-vh-100 py-5">
       <div className="container">
