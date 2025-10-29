@@ -33,7 +33,7 @@ export default function Router() {
           <Route path="agregarProducto" element={<AgregarProductos />} />
           <Route path="admin" element={<HomeAdmin />} />
           <Route path="envio" element={<Envio />} />
-          <Route path="oferta" element={<Ofertas />}/>
+          <Route path="ofertas" element={<Ofertas />}/>
         </Route>
       </Routes>
     </BrowserRouter>
