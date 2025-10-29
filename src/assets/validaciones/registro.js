@@ -1,12 +1,20 @@
 const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@(duoc\.cl|duoc\.profesor\.cl|gmail\.com)$/;
 
-export function validarRegistro({ nombre, correo, password, confirmPassword }) {
+export function validarRegistro({ nombre, correo, password, confirmPassword, confirmCalle }) {
     const errores = {};
 
     const nombreNorm = (nombre ?? "").trim();
     const correoNorm = (correo ?? "").trim();
     const passNorm = (password ?? "");
     const confirmNorm = (confirmPassword ?? "");
+    const confiCalle = (confirmCalle ?? "");
+
+    if (!confiCalle){
+        errores.confirmCalle = "La calle es obligatoria";
+    } else if (confiCalle.length < 3){
+        errores.confirmCalle = "Debe tener al menos 3 caracteres.";
+    }
+    
 
     if (!nombreNorm) {
         errores.nombre = "El nombre es obligatorio.";
@@ -51,5 +59,4 @@ export function validarRegistro({ nombre, correo, password, confirmPassword }) {
 
     return errores;
 }
-
 export default validarRegistro;

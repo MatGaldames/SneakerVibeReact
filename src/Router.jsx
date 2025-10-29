@@ -13,6 +13,7 @@ import Carrito from "./pages/Carrito";
 import AgregarProductos from "./pages/agregarProducto";
 import homeAdmin from "./pages/homeAdmin";
 import Envio from "./pages/Envio";
+import Ofertas from "./pages/Ofertas"
 
 
 export default function Router() {
@@ -32,6 +33,7 @@ export default function Router() {
           <Route path="agregarProducto" element={<AgregarProductos />} />
           <Route path="homeAdmin" element={< homeAdmin/>} />
           <Route path="envio" element={<Envio />} />
+          <Route path="oferta" element={<Ofertas />}/>
         </Route>
       </Routes>
     </BrowserRouter>

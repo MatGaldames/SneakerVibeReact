@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";                    // <-- 
 import { regionesYcomunas } from "../data/ubicaciones";                  // <-- NUEVO
 
 export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
-  const [form, setForm] = useState({ nombre: "", correo: "", password: "", confirmPassword: "" });
+  const [form, setForm] = useState({ nombre: "", correo: "", password: "", confirmPassword: "", confirmCalle: "" });
   const [errores, setErrores] = useState({});
   const [mensajeGeneral, setMensajeGeneral] = useState("");              // <-- NUEVO
   const navigate = useNavigate();                                        // <-- NUEVO
@@ -31,7 +31,7 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
         apellido: form.apellido,
         correo: form.correo,
         password: form.password,
-        direccion: form.direccion,
+        direccion: form.confirmCalle,
         numeracion: form.numeracion,
         region: form.region,
         comuna: form.comuna
@@ -166,20 +166,19 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
 
                 <div className="mb-3">
                   <label htmlFor="RegDireccion"
-                    className={`form-label fw-semibold ${errores.direccion ? "is-invali" : ""}`}
                   >
                     Direccion
                   </label>
                   <input
                     type="text"
-                    className="form-control"
-                    id="direccion"
+                    className={`form-control ${errores.confirmCalle ? "is-invalid" : ""}`}
+                    id="confirmCalle"
                     placeholder="Tu direccion"
-                    value={form.direccion}
+                    value={form.confirmCalle}
                     onChange={manejarCambio}
                     onBlur={manejarEnfocar}
-                  /> {errores.direccion &&
-                    (<div className="invalid-feedback">{errores.direccion}
+                  /> {errores.confirmCalle &&
+                    (<div className="invalid-feedback">{errores.confirmCalle}
                     </div>)}
                 </div>
 
