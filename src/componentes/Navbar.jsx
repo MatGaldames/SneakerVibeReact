@@ -53,6 +53,7 @@ export default function Navbar() {
         <ul className="navbar-nav">
           <li className="nav-item mx-2"><Link className="nav-link" to="/">Inicio</Link></li>
           <li className="nav-item mx-2"><Link className="nav-link" to="/productos">Productos</Link></li>
+          <li className="nav-item mx-2"><Link className="nav-link" to="/ofertas">Ofertas</Link></li>
           <li className="nav-item mx-2"><Link className="nav-link" to="/blog">Blog</Link></li>
           <li className="nav-item mx-2"><Link className="nav-link" to="/contacto">Contacto</Link></li>
           <li className="nav-item mx-2"><Link className="nav-link" to="/carrito">Carrito</Link></li>

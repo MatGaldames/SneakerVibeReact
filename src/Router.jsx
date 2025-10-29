@@ -12,6 +12,7 @@ import Blog from "./pages/Blog";
 import Carrito from "./pages/Carrito";
 import VistaAdmin from "./pages/vistaAdmin";
 import Envio from "./pages/Envio";
+import Ofertas from "./pages/Ofertas"
 
 export default function Router() {
   return (
@@ -29,6 +30,7 @@ export default function Router() {
           <Route path="blog" element={<Blog />} />
           <Route path="vistaAdmin" element={<VistaAdmin />} />
           <Route path="envio" element={<Envio />} />
+          <Route path="oferta" element={<Ofertas />}/>
         </Route>
       </Routes>
     </BrowserRouter>
