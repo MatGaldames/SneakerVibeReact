@@ -125,7 +125,7 @@ const productos = [
     imgSrc: "/assets/img/LefranceR.png",
     altText: "Puma LaFrance roja",
     titulo: "LaFrance PUMA",
-    descripcion: "Zapatilla de hombre original color rojo.",
+    descripcion: "Zapatilla de hombre original color beige.",
     precio: 110990,
     tallas: [
       { us: "5.5", uk: "4.5", eu: "38", cm: "23.5" },

@@ -37,8 +37,7 @@ export default function Router() {
           <Route path="admin/productos" element={<AdminProductos />} />
           <Route path="admin/usuarios" element={<AdminUsuarios />} />
           <Route path="envio" element={<Envio />} />
-          <Route path="oferta" element={<Ofertas />}/>
-
+          <Route path="ofertas" element={<Ofertas />}/>
         </Route>
       </Routes>
     </BrowserRouter>

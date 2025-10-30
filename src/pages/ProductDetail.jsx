@@ -2,6 +2,7 @@ import { useCarrito } from "../utilidades/useCarrito";
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import productos from "../data/productos";
+import ofertas from "../data/ofertas";
 
 export default function ProductDetail() {
     const { add } = useCarrito();
@@ -10,7 +11,11 @@ export default function ProductDetail() {
     const searchParams = new URLSearchParams(location.search);
     const productId = searchParams.get("id");
 
-    const producto = productos.find((p) => p.id === productId);
+    const productoBase = productos.find((p) => p.id === productId);
+    const oferta = ofertas.find((o)=> o.id === productId)
+    const producto = productoBase
+    ? { ...productoBase, precioOferta: oferta?.precioOferta }
+    : null;
 
     if (!producto) {
         return (
@@ -54,9 +59,12 @@ export default function ProductDetail() {
                                 ))}
                         </select>
 
-                        <button className="btn btn-danger w-100 mb-3" onClick={()=> add({ ...producto, talla })}>
-                            Agregar al carrito
-                        </button>
+                        <button
+  className="btn btn-danger w-100 mb-3"
+  onClick={() => add({ ...producto, precio: precioEfectivo, talla })}
+>
+  Agregar al carrito
+</button>
 
                         {producto.tallas[0]?.eu && (
                             <>
@@ -119,7 +127,6 @@ export default function ProductDetail() {
                     </div>
                 </div>
             </section>
-
         </main>
     );
 }
