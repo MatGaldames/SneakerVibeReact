@@ -8,6 +8,7 @@ const productos = [
     titulo: "Campus 00s Black",
     descripcion: "Zapatilla Campus 00s de gamuza color negro con detalles blancos.",
     precio: 109990,
+    precioOferta: null,
     tallas: [
       { us: "5.5", uk: "4.5", eu: "38", cm: "23.5" },
       { us: "6", uk: "5", eu: "38.5", cm: "24" },
@@ -25,6 +26,7 @@ const productos = [
     titulo: "Campus 00s White",
     descripcion: "Zapatilla Campus 00s de gamuza color blanco con detalles negros.",
     precio: 89990,
+    precioOferta: null,
     tallas: [
       { us: "5.5", uk: "4.5", eu: "38", cm: "23.5" },
       { us: "6", uk: "5", eu: "38.5", cm: "24" },
@@ -42,6 +44,7 @@ const productos = [
     titulo: "Campus 00s Pink",
     descripcion: "Zapatilla Campus 00s de gamuza color rosado con detalles blancos.",
     precio: 99990,
+    precioOferta: null,
     tallas: [
       { us: "5.5", uk: "4.5", eu: "38", cm: "23.5" },
       { us: "6", uk: "5", eu: "38.5", cm: "24" },
@@ -59,6 +62,7 @@ const productos = [
     titulo: "Nike TN Air Max Plus",
     descripcion: "Zapatilla de hombre original en color negro.",
     precio: 185990,
+    precioOferta: null,
     tallas: [
       { us: "5.5", uk: "4.5", eu: "38", cm: "23.5" },
       { us: "6", uk: "5", eu: "38.5", cm: "24" },
@@ -76,6 +80,7 @@ const productos = [
     titulo: "Nike TN Air Max Plus",
     descripcion: "Zapatilla de hombre original en color blanco.",
     precio: 185990,
+    precioOferta: null,
     tallas: [
       { us: "5.5", uk: "4.5", eu: "38", cm: "23.5" },
       { us: "6", uk: "5", eu: "38.5", cm: "24" },
@@ -93,6 +98,7 @@ const productos = [
     titulo: "Nike TN Air Max Plus",
     descripcion: "Zapatilla de hombre original en color azul.",
     precio: 185990,
+    precioOferta: null,
     tallas: [
       { us: "5.5", uk: "4.5", eu: "38", cm: "23.5" },
       { us: "6", uk: "5", eu: "38.5", cm: "24" },
@@ -110,6 +116,7 @@ const productos = [
     titulo: "LaFrance PUMA",
     descripcion: "Zapatilla de hombre original color negro.",
     precio: 110990,
+    precioOferta: null,
     tallas: [
       { us: "5.5", uk: "4.5", eu: "38", cm: "23.5" },
       { us: "6", uk: "5", eu: "38.5", cm: "24" },
@@ -127,6 +134,7 @@ const productos = [
     titulo: "LaFrance PUMA",
     descripcion: "Zapatilla de hombre original color beige.",
     precio: 110990,
+    precioOferta: null,
     tallas: [
       { us: "5.5", uk: "4.5", eu: "38", cm: "23.5" },
       { us: "6", uk: "5", eu: "38.5", cm: "24" },
@@ -144,6 +152,7 @@ const productos = [
     titulo: "LaFrance PUMA",
     descripcion: "Zapatilla de hombre original color plateado.",
     precio: 110990,
+    precioOferta: null,
     tallas: [
       { us: "5.5", uk: "4.5", eu: "38", cm: "23.5" },
       { us: "6", uk: "5", eu: "38.5", cm: "24" },
@@ -161,6 +170,7 @@ const productos = [
     titulo: "Adidas F1 Mercedes",
     descripcion: "Polerón F1 Mercedes color negro.",
     precio: 99990,
+    precioOferta: null,
     tallas: ["XS", "S", "M", "L", "XL"]
   },
   {
@@ -172,6 +182,7 @@ const productos = [
     titulo: "Polerón Liverpool",
     descripcion: "Polerón rojo del equipo Liverpool FC.",
     precio: 89990,
+    precioOferta: null,
     tallas: ["XS", "S", "M", "L", "XL"]
   },
   {
@@ -183,6 +194,7 @@ const productos = [
     titulo: "Polerón Adidas",
     descripcion: "Polerón negro Adidas.",
     precio: 59990,
+    precioOferta: null,
     tallas: ["XS", "S", "M", "L", "XL"]
   },
   {
@@ -194,6 +206,7 @@ const productos = [
     titulo: "Bolso Nike Gym Duffel",
     descripcion: "Bolso deportivo Nike ideal para gimnasio o viajes, con amplio compartimento principal y correas ajustables.",
     precio: 49990,
+    precioOferta: null,
     tallas: ["Única"]
   },
   {
@@ -205,6 +218,7 @@ const productos = [
     titulo: "Gorra Nike Performance",
     descripcion: "Gorra Nike con diseño ergonómico y material Dri-FIT que ofrece comodidad y transpirabilidad durante todo el día.",
     precio: 24990,
+    precioOferta: null,
     tallas: ["Única"]
   },
   {
@@ -216,6 +230,7 @@ const productos = [
     titulo: "Calcetas Nike Sportswear",
     descripcion: "Pack de 3 pares de calcetas Nike de algodón premium con logo bordado y ajuste elástico para mayor confort.",
     precio: 14990,
+    precioOferta: null,
     tallas: ["S", "M", "L"]
   }
 ];
