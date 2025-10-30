@@ -1,8 +1,10 @@
 // src/pages/Carrito.jsx
 import React from "react";
 import { useCarrito } from "../utilidades/useCarrito";
+import { createOrderNumber, saveOrder } from "../utilidades/orderStorage";
 import { clp } from "../assets/hooks/currency";
 import { useNavigate } from "react-router-dom";
+
 
 
 export default function Carrito() {

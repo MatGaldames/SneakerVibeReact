@@ -39,7 +39,7 @@ const usuarios = [
     id: "admin-002",
     nombre: "Fernando",
     apellido: "Campos",
-    correo: "fernando@duoc.com",
+    correo: "fernando@duoc.cl",
     password: "12345",
     rol: "admin",
     domicilio: "weber",

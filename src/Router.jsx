@@ -16,6 +16,8 @@ import Envio from "./pages/Envio";
 import Ofertas from "./pages/Ofertas"
 import AdminProductos from "./pages/ProductosAdmin";
 import AdminUsuarios from "./pages/AdminUsuarios";
+import BoletasPage from "./pages/BoletaAdmin";
+import AdminBoletaView from "./pages/BoletaVista";
 
 
 export default function Router() {
@@ -38,6 +40,8 @@ export default function Router() {
           <Route path="admin/usuarios" element={<AdminUsuarios />} />
           <Route path="envio" element={<Envio />} />
           <Route path="ofertas" element={<Ofertas />}/>
+          <Route path="admin/ordenes" element={<BoletasPage />}/>
+          <Route path="/admin/boletas/:id" element={<AdminBoletaView />} />
         </Route>
       </Routes>
     </BrowserRouter>
