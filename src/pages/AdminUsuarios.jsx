@@ -1,29 +1,70 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DashboardSidebar from "../componentes/Dashboard";
-import usuariosSeed from "../data/usuarios"; // <-- AJUSTA si tu archivo se llama distinto
-import { loadDeletedUsers, markUserDeleted, getStableUserId } from "../utilidades/deletedUsersSession";
+import usuariosSeed from "../data/usuarios";
+import {
+  loadDeletedUsers,
+  markUserDeleted,
+  getStableUserId,
+} from "../utilidades/deletedUsersSession";
+
+/* Lee usuarios registrados en localStorage (clave actual y legacy) y deduplica por correo */
+const leerUsuariosExtraLocal = () => {
+  const parse = (txt) => {
+    try {
+      const arr = JSON.parse(txt || "[]");
+      return Array.isArray(arr) ? arr : [];
+    } catch {
+      return [];
+    }
+  };
+  const actuales = parse(localStorage.getItem("sv_usuarios_extra")); // clave usada por registrarUsuarioComun
+  const legacy = parse(localStorage.getItem("usuarios"));            // por si existe histórico
+
+  const key = (u) => String(u?.correo ?? u?.email ?? "").toLowerCase();
+  const map = new Map();
+  [...actuales, ...legacy].forEach((u) => {
+    const k = key(u);
+    if (k) map.set(k, u);
+  });
+  return [...map.values()];
+};
+
+/* Construye el listado visible: seed + extras – eliminados por sesión */
+const construirListado = () => {
+  const deleted = loadDeletedUsers();
+  const extras = leerUsuariosExtraLocal();
+  const todos = [...(usuariosSeed || []), ...extras];
+
+  return todos
+    .map((u, i) => ({ ...u, __sid: getStableUserId(u, i) }))
+    .filter((u) => !deleted.has(u.__sid));
+};
 
 export default function AdminUsuarios() {
-  const [usuarios, setUsuarios] = useState(() => {
-    const deleted = loadDeletedUsers();
-    return (usuariosSeed || [])
-      .map((u, i) => ({ ...u, __sid: getStableUserId(u, i) }))
-      .filter((u) => !deleted.has(u.__sid));
-  });
+  const [usuarios, setUsuarios] = useState(() => construirListado());
+
+  // Refrescar si cambian los usuarios en localStorage (registro nuevo) o si otras pestañas cambian datos
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === "sv_usuarios_extra" || e.key === "usuarios") {
+        setUsuarios(construirListado());
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   const eliminar = (sid) => {
     setUsuarios((prev) => prev.filter((u) => u.__sid !== sid));
-    markUserDeleted(sid);
+    markUserDeleted(sid); // persiste el bloqueo en sessionStorage
   };
 
-  const active = "usuarios"; // para resaltar en el sidebar si lo usas
+  const active = "usuarios";
 
   return (
     <main className="min-vh-100 bg-light d-flex flex-column flex-md-row">
-      {/* Sidebar escritorio */}
       <DashboardSidebar active={active} />
 
-      {/* Contenido */}
       <section className="flex-grow-1 p-4">
         <div className="container-fluid">
           <div className="d-flex align-items-center justify-content-between mb-4">
@@ -32,7 +73,9 @@ export default function AdminUsuarios() {
           </div>
 
           {usuarios.length === 0 ? (
-            <div className="alert alert-light border text-center">No hay usuarios.</div>
+            <div className="alert alert-light border text-center">
+              No hay usuarios.
+            </div>
           ) : (
             <ul className="list-unstyled m-0">
               {usuarios.map((u) => {
@@ -45,7 +88,7 @@ export default function AdminUsuarios() {
                     <article className="card neon-card border-0">
                       <div className="card-body py-3">
                         <div className="row align-items-center g-3">
-                          {/* Ícono usuario (en lugar de imagen) */}
+                          {/* Ícono usuario */}
                           <div className="col-auto">
                             <div
                               className="d-flex align-items-center justify-content-center rounded"
@@ -80,7 +123,7 @@ export default function AdminUsuarios() {
                             </button>
                           </div>
 
-                          {/* Rol en móvil (segunda línea) */}
+                          {/* Rol en móvil */}
                           <div className="col-12 d-sm-none">
                             <div className="text-end">
                               <span className="badge text-bg-light border">{rol}</span>

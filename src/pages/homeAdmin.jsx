@@ -1,19 +1,49 @@
 import React from "react";
 import DashboardSidebar from "../componentes/Dashboard";
-import productosData from "../data/productos"; // ajusta la ruta si difiere
+import productosData from "../data/productos";
+import usuariosData from "../data/usuarios";
 import { loadDeleted, getStableId } from "../utilidades/deletedProductsSession";
+import { loadDeletedUsers, getStableUserId } from "../utilidades/deletedUsersSession";
 
+// Lee usuarios creados en localStorage (clave actual y legacy) y deduplica por correo
+const leerUsuariosExtraLocal = () => {
+  const parse = (txt) => {
+    try {
+      const arr = JSON.parse(txt || "[]");
+      return Array.isArray(arr) ? arr : [];
+    } catch {
+      return [];
+    }
+  };
+  const actuales = parse(localStorage.getItem("sv_usuarios_extra"));
+  const legacy   = parse(localStorage.getItem("usuarios"));
+
+  const key = (u) => String(u?.correo ?? u?.email ?? "").toLowerCase();
+  const map = new Map();
+  [...actuales, ...legacy].forEach((u) => {
+    const k = key(u);
+    if (k) map.set(k, u);
+  });
+  return [...map.values()];
+};
 
 export default function HomeAdmin() {
-  const active = "dashboard"; // usado por el sidebar y las tabs móviles
-
+  const active = "dashboard";
   const nf = new Intl.NumberFormat("es-CL");
 
+  // Productos visibles (descontando eliminados en la sesión)
   const productCount = React.useMemo(() => {
     const deleted = loadDeleted();
     return (productosData || []).filter((p, i) => !deleted.has(getStableId(p, i))).length;
   }, []);
 
+  // Usuarios visibles (seed + registrados en localStorage, descontando eliminados en la sesión)
+  const userCount = React.useMemo(() => {
+    const deleted = loadDeletedUsers();
+    const extras  = leerUsuariosExtraLocal();
+    const all     = [...(usuariosData || []), ...extras];
+    return all.filter((u, i) => !deleted.has(getStableUserId(u, i))).length;
+  }, []);
 
   return (
     <main className="min-vh-100 bg-light d-flex flex-column flex-md-row">
@@ -54,10 +84,10 @@ export default function HomeAdmin() {
           {/* KPIs superiores */}
           <div className="row g-3 mb-4">
             {[
-              { icon: "bi-people", value: "2.5K", label: "Usuarios", href: "/admin/usuarios" },
-              { icon: "bi-receipt", value: "1.8K", label: "Pedidos", href: "/admin/ordenes" },
-              { icon: "bi-bag", value: nf.format(productCount), label: "Productos", href: "/admin/productos" },
-              { icon: "bi-info-square", value: "54", label: "Reportes", href: "/admin/reportes" },
+              { icon: "bi-people",      value: nf.format(userCount),  label: "Usuarios",  href: "/admin/usuarios"  },
+              { icon: "bi-receipt",     value: "1.8K",               label: "Pedidos",   href: "/admin/ordenes"   },
+              { icon: "bi-bag",         value: nf.format(productCount), label: "Productos", href: "/admin/productos" },
+              { icon: "bi-info-square", value: "54",                 label: "Reportes",  href: "/admin/reportes"  },
             ].map((k, i) => (
               <div className="col-12 col-sm-6 col-lg-3" key={i}>
                 <div className="card h-100 border-0 text-center neon-card">
@@ -71,9 +101,6 @@ export default function HomeAdmin() {
               </div>
             ))}
           </div>
-
-
-
 
           {/* gráfico placeholder */}
           <div className="card">

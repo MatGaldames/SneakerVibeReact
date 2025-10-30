@@ -12,24 +12,26 @@ export default function Navbar() {
   const [usuario, setUsuario] = useState(() => leeSesion());
 
   useEffect(() => {
-  const onStorage = (e) => {
-    if (e.key === "sv_usuario") setUsuario(leeSesion());
-  };
-  const onSesionCambio = () => setUsuario(leeSesion());
+    const onStorage = (e) => {
+      if (e.key === "sv_usuario") setUsuario(leeSesion());
+    };
+    const onSesionCambio = () => setUsuario(leeSesion());
 
-  window.addEventListener("storage", onStorage);
-  window.addEventListener("sv_sesion_cambio", onSesionCambio);
-  return () => {
-    window.removeEventListener("storage", onStorage);
-    window.removeEventListener("sv_sesion_cambio", onSesionCambio);
-  };
-}, []);
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("sv_sesion_cambio", onSesionCambio);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("sv_sesion_cambio", onSesionCambio);
+    };
+  }, []);
 
   const manejarCerrarSesion = () => {
     borraSesion();
     setUsuario(null);
     navigate("/", { replace: true });
   };
+
+  const esAdmin = (usuario?.rol ?? usuario?.role) === "admin";
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light px-4">
@@ -57,6 +59,15 @@ export default function Navbar() {
           <li className="nav-item mx-2"><Link className="nav-link" to="/blog">Blog</Link></li>
           <li className="nav-item mx-2"><Link className="nav-link" to="/contacto">Contacto</Link></li>
           <li className="nav-item mx-2"><Link className="nav-link" to="/carrito">Carrito</Link></li>
+
+          {/* 👇 Ítem Administrador, solo visible si el usuario logueado es admin */}
+          {esAdmin && (
+            <li className="nav-item mx-2">
+              <Link className="nav-link fw-semibold text-danger" to="/admin/dashboard">
+                Administrador
+              </Link>
+            </li>
+          )}
         </ul>
 
         <div className="d-flex align-items-center">
