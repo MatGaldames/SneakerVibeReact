@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { validarLogin } from "../assets/validaciones/login";
 import { autenticarConArray } from "../utilidades/autenticacion";
 import { Link, useNavigate } from "react-router-dom";
+import usuariosSeed from "../data/usuarios"; // si ya lo tenías con otro nombre, úsalo
+import { loadDeletedUsers, getStableUserId } from "../utilidades/deletedUsersSession";
+
 
 
 
@@ -27,22 +30,38 @@ export default function Login({ bgUrl = "/assets/img/auth-bg.jpg" }) {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const val = validarLogin(form);
-    setErrores(val);
-    if (Object.keys(val).length > 0) return;
+  e.preventDefault();
 
-    const { ok, error } = autenticarConArray({
-      correo: form.correo,
-      password: form.password,
-    });
-    if (!ok) {
-      setErrores((prev) => ({ ...prev, general: error || "No se pudo iniciar sesión." }));
-      return;
-    }
+  // 1) Usuarios “seed” + los registrados en localStorage (si no usas localStorage, esta línea no rompe)
+  const extras = JSON.parse(localStorage.getItem("usuarios") || "[]");
+  const allUsers = [...(usuariosSeed || []), ...extras];
 
-    navigate("/", { replace: true });
-  };
+  // 2) Set de IDs eliminados por el admin en esta sesión
+  const deleted = loadDeletedUsers();
+
+  // 3) Busca por credenciales (para distinguir “eliminado” de “credenciales inválidas”)
+  const getMail = (u) => u.correo ?? u.email ?? "";
+  const getPass = (u) => u.password ?? u.pass ?? "";
+  const candidato = allUsers.find(
+    (u) => getMail(u) === form.correo && getPass(u) === form.password
+  );
+
+  // 4) Si coincide por credenciales, revisa si está bloqueado por sesión
+  if (candidato && deleted.has(getStableUserId(candidato))) {
+    setErrores({ general: "Tu cuenta fue deshabilitada temporalmente por el administrador durante esta sesión." });
+    return;
+  }
+
+  // 5) Si no coincide o estaba eliminado, error estándar
+  if (!candidato) {
+    setErrores({ general: "Correo y/o contraseña inválidos." });
+    return;
+  }
+
+  // 6) OK → continúa tu flujo de login
+  // ... guarda sesión, redirige, etc.
+};
+
 
 
   return (
