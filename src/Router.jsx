@@ -32,7 +32,7 @@ export default function Router() {
           <Route path="categoria" element={<CategoriaDetalle />} />
           <Route path="carrito" element={<Carrito />} />
           <Route path="blog" element={<Blog />} />
-          <Route path="agregarProducto" element={<AgregarProductos />} />
+          <Route path="/admin/agregarProducto" element={<AgregarProductos />} />
           <Route path="admin/dashboard" element={<HomeAdmin />} />
           <Route path="admin/productos" element={<AdminProductos />} />
           <Route path="admin/usuarios" element={<AdminUsuarios />} />

@@ -62,7 +62,7 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
       <div className="container position-relative">
         <div className="row justify-content-center">
           <div className="col-12 col-sm-10 col-md-8 col-lg-5">
-            <div className="card shadow-lg p-4 border-0 rounded-4">
+            <div className="card shadow-lg my-5 p-4 border-0 rounded-4">
               <h3 className="text-center mb-4 text-danger">Crear Cuenta</h3>
 
               <form onSubmit={manejarEnviar} noValidate>

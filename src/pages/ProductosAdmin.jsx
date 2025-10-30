@@ -85,13 +85,29 @@ export default function AdminProductos() {
       {/* Contenido */}
       <section className="flex-grow-1 p-4">
         <div className="container-fluid">
+          {/* Header + CTA */}
           <div className="d-flex align-items-center justify-content-between mb-4">
-            <h3 className="fw-bold">Productos</h3>
-            <span className="badge rounded-pill text-bg-danger">Admin</span>
+            <div className="d-flex align-items-center gap-3">
+              <h3 className="fw-bold m-0">Productos</h3>
+              <span className="badge rounded-pill text-bg-danger">Admin</span>
+            </div>
+
+            {/* CTA: Agregar producto */}
+            <a href="/admin/agregarProducto" className="btn btn-danger neon-btn">
+              <i className="bi bi-plus-lg me-1" />
+              Agregar producto
+            </a>
           </div>
 
           {listado.length === 0 ? (
-            <div className="alert alert-light border text-center">No hay productos.</div>
+            <div className="alert alert-light border text-center">
+              No hay productos.
+              <div className="mt-3">
+                <a href="/admin/agregarProducto" className="btn btn-danger btn-sm neon-btn">
+                  <i className="bi bi-plus-lg me-1" /> Crear el primero
+                </a>
+              </div>
+            </div>
           ) : (
             <ul className="list-unstyled m-0">
               {listado.map((p) => {
