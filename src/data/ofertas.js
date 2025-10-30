@@ -60,7 +60,7 @@ const ofertas = [
     imgSrc:"/assets/img/Dunk.jpg",
     altText:"Nike Dunk Low",
     titulo:"Nike Dunk Low",
-    descripcion:"Siempre puedes contar con un clásico. Los Dunk Low combinan un icónico diseño de colores contrastantes con materiales premium y un acolchado suave para ofrecer una comodidad duradera que cambia las reglas del juego. Las posibilidades son infinitas.",
+    descripcion:"Nike DUNK",
     precio:132990,
     precioOferta:102990,
     tallas:[
