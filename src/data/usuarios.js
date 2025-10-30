@@ -4,10 +4,10 @@ const usuarios = [
     nombre: "Matias",
     apellido: "Galdames",
     correo: "Matias@gmail.com",
-    password: "Admin123",
+    password: "12345",
     rol: "admin",
     domicilio: "Calle Falsa 123",
-    numeracion: "123",
+    numeracion: "12345",
     region: "Metropolitana",
     comuna: "Santiago"
   },
@@ -16,12 +16,36 @@ const usuarios = [
     nombre: "Juan",
     apellido: "Perez",
     correo: "juan.perez@gmail.com",
-    password: "Juan123",
+    password: "12345",
     rol: "comun",
     direccion: "Avenida Siempre Viva 742",
     numeracion: "742",
     region: "Metropolitana",
     comuna: "Providencia"
+  },
+  {
+    id: "user-002",
+    nombre: "Diego",
+    apellido: "Robles",
+    correo: "diego@gmail.com",
+    password: "12345",
+    rol: "comun",
+    direccion: "Rojas Magallanes",
+    numeracion: "74",
+    region: "Metropolitana",
+    comuna: "La Florida"
+  },
+  {
+    id: "admin-002",
+    nombre: "Fernando",
+    apellido: "Campos",
+    correo: "fernando@duoc.com",
+    password: "12345",
+    rol: "admin",
+    domicilio: "weber",
+    numeracion: "56",
+    region: "Metropolitana",
+    comuna: "Puente Alto"
   }
 ];
 

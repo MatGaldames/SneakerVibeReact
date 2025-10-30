@@ -1,8 +1,8 @@
 // arriba del archivo
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DashboardSidebar from "../componentes/Dashboard";
 import productosSeed from "../data/productos";
-import { loadDeleted, markDeleted, getStableId } from "../utilidades/deletedProductsSession";
+import { loadDeleted, markDeleted, unmarkDeleted, getStableId } from "../utilidades/deletedProductsSession";
 
 // ----- helpers -----
 const formatCLP = (v) =>
@@ -20,17 +20,37 @@ const resolveImgSrc = (path) => {
 
 // ----- componente -----
 export default function AdminProductos() {
-  const [productos, setProductos] = useState(() => {
-    const deleted = loadDeleted();
-    return (productosSeed || [])
-      .map((p, i) => ({ ...p, __sid: getStableId(p, i) })) // id estable
-      .filter((p) => !deleted.has(p.__sid));
-  });
+  // Set de deshabilitados en sessionStorage
+  const [deletedSet, setDeletedSet] = useState(loadDeleted());
+
+  // (Opcional) Escucha cambios desde otras pestañas
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === "sv:admin:deletedProducts") {
+        setDeletedSet(loadDeleted());
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  const refreshDeleted = () => setDeletedSet(new Set(loadDeleted()));
 
   const eliminar = (sid) => {
-    setProductos((prev) => prev.filter((p) => p.__sid !== sid));
-    markDeleted(sid);
+    markDeleted(sid);   // marca como deshabilitado
+    refreshDeleted();
   };
+
+  const habilitar = (sid) => {
+    unmarkDeleted(sid); // vuelve a habilitar
+    refreshDeleted();
+  };
+
+  // Construye el listado SIN filtrar, marcando cada item con __deleted
+  const listado = (productosSeed || []).map((p, i) => {
+    const sid = getStableId(p, i);
+    return { ...p, __sid: sid, __deleted: deletedSet.has(sid) };
+  });
 
   const active = "productos";
 
@@ -70,20 +90,24 @@ export default function AdminProductos() {
             <span className="badge rounded-pill text-bg-danger">Admin</span>
           </div>
 
-          {productos.length === 0 ? (
+          {listado.length === 0 ? (
             <div className="alert alert-light border text-center">No hay productos.</div>
           ) : (
             <ul className="list-unstyled m-0">
-              {productos.map((p) => {
+              {listado.map((p) => {
                 const titulo = p.titulo ?? p.nombre ?? "Sin título";
                 const categoria = p.categoria ?? p.category ?? "Sin categoría";
                 const precio = p.precio ?? p.price ?? 0;
                 const src = resolveImgSrc(p.imgSrc ?? p.img ?? p.image ?? p.imagen ?? p.src);
                 const alt = p.altText ?? titulo;
+                const isDeleted = !!p.__deleted;
 
                 return (
                   <li key={p.__sid} className="mb-2">
-                    <article className="card neon-card border-0">
+                    <article
+                      className={`card neon-card border-0 ${isDeleted ? "opacity-50" : ""}`}
+                      title={isDeleted ? "Producto deshabilitado" : undefined}
+                    >
                       <div className="card-body py-3">
                         <div className="row align-items-center g-3">
                           {/* IMG */}
@@ -101,7 +125,12 @@ export default function AdminProductos() {
 
                           {/* TÍTULO + CATEGORÍA */}
                           <div className="col">
-                            <div className="fw-semibold">{titulo}</div>
+                            <div className="d-flex align-items-center gap-2">
+                              <div className="fw-semibold">{titulo}</div>
+                              {isDeleted && (
+                                <span className="badge text-bg-secondary">Deshabilitado</span>
+                              )}
+                            </div>
                             <small className="text-muted">{categoria}</small>
                           </div>
 
@@ -114,10 +143,23 @@ export default function AdminProductos() {
 
                           {/* ACCIÓN */}
                           <div className="col-auto">
-                            <button className="btn btn-outline-danger btn-sm" onClick={() => eliminar(p.__sid)}>
-                              <i className="bi bi-trash me-1" />
-                              Eliminar
-                            </button>
+                            {isDeleted ? (
+                              <button
+                                className="btn btn-outline-success btn-sm"
+                                onClick={() => habilitar(p.__sid)}
+                              >
+                                <i className="bi bi-arrow-counterclockwise me-1" />
+                                Habilitar
+                              </button>
+                            ) : (
+                              <button
+                                className="btn btn-outline-danger btn-sm"
+                                onClick={() => eliminar(p.__sid)}
+                              >
+                                <i className="bi bi-trash me-1" />
+                                Eliminar
+                              </button>
+                            )}
                           </div>
 
                           {/* PRECIO móvil */}

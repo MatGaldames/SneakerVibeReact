@@ -19,3 +19,13 @@ export const markDeleted = (stableId) => {
   set.add(stableId);
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
 };
+
+// Quitar un id del set de eliminados (habilitar)
+export const unmarkDeleted = (stableId) => {
+  const set = loadDeleted();
+  set.delete(stableId);
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
+};
+
+// Helper opcional
+export const isDeleted = (stableId) => loadDeleted().has(stableId);

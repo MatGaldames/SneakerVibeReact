@@ -4,6 +4,7 @@ import usuariosSeed from "../data/usuarios";
 import {
   loadDeletedUsers,
   markUserDeleted,
+  unmarkUserDeleted,
   getStableUserId,
 } from "../utilidades/deletedUsersSession";
 
@@ -29,15 +30,16 @@ const leerUsuariosExtraLocal = () => {
   return [...map.values()];
 };
 
-/* Construye el listado visible: seed + extras – eliminados por sesión */
+/* Construye el listado: seed + extras, SIN filtrar; marcamos __deleted */
 const construirListado = () => {
   const deleted = loadDeletedUsers();
   const extras = leerUsuariosExtraLocal();
   const todos = [...(usuariosSeed || []), ...extras];
 
-  return todos
-    .map((u, i) => ({ ...u, __sid: getStableUserId(u, i) }))
-    .filter((u) => !deleted.has(u.__sid));
+  return todos.map((u, i) => {
+    const sid = getStableUserId(u, i);
+    return { ...u, __sid: sid, __deleted: deleted.has(sid) };
+  });
 };
 
 export default function AdminUsuarios() {
@@ -54,9 +56,14 @@ export default function AdminUsuarios() {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
+  // Deshabilitar (soft-delete) y Habilitar (undo)
   const eliminar = (sid) => {
-    setUsuarios((prev) => prev.filter((u) => u.__sid !== sid));
-    markUserDeleted(sid); // persiste el bloqueo en sessionStorage
+    markUserDeleted(sid);         // persiste el bloqueo en sessionStorage
+    setUsuarios(construirListado());
+  };
+  const habilitar = (sid) => {
+    unmarkUserDeleted(sid);       // quita del set de eliminados
+    setUsuarios(construirListado());
   };
 
   const active = "usuarios";
@@ -82,10 +89,14 @@ export default function AdminUsuarios() {
                 const nombre = u.nombre ?? u.name ?? "Sin nombre";
                 const correo = u.correo ?? u.email ?? "sin-correo@ejemplo.cl";
                 const rol = u.rol ?? u.role ?? "Cliente";
+                const isDeleted = !!u.__deleted;
 
                 return (
                   <li key={u.__sid} className="mb-2">
-                    <article className="card neon-card border-0">
+                    <article
+                      className={`card neon-card border-0 ${isDeleted ? "opacity-50" : ""}`}
+                      title={isDeleted ? "Usuario deshabilitado" : undefined}
+                    >
                       <div className="card-body py-3">
                         <div className="row align-items-center g-3">
                           {/* Ícono usuario */}
@@ -101,7 +112,12 @@ export default function AdminUsuarios() {
 
                           {/* Nombre + correo */}
                           <div className="col">
-                            <div className="fw-semibold">{nombre}</div>
+                            <div className="d-flex align-items-center gap-2">
+                              <div className="fw-semibold">{nombre}</div>
+                              {isDeleted && (
+                                <span className="badge text-bg-secondary">Deshabilitado</span>
+                              )}
+                            </div>
                             <small className="text-muted">{correo}</small>
                           </div>
 
@@ -114,13 +130,23 @@ export default function AdminUsuarios() {
 
                           {/* Acción */}
                           <div className="col-auto">
-                            <button
-                              className="btn btn-outline-danger btn-sm"
-                              onClick={() => eliminar(u.__sid)}
-                            >
-                              <i className="bi bi-trash me-1" />
-                              Eliminar
-                            </button>
+                            {isDeleted ? (
+                              <button
+                                className="btn btn-outline-success btn-sm"
+                                onClick={() => habilitar(u.__sid)}
+                              >
+                                <i className="bi bi-arrow-counterclockwise me-1" />
+                                Habilitar
+                              </button>
+                            ) : (
+                              <button
+                                className="btn btn-outline-danger btn-sm"
+                                onClick={() => eliminar(u.__sid)}
+                              >
+                                <i className="bi bi-trash me-1" />
+                                Eliminar
+                              </button>
+                            )}
                           </div>
 
                           {/* Rol en móvil */}
