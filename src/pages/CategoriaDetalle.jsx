@@ -1,33 +1,109 @@
-import React from "react";
+// src/pages/CategoriaDetalle.jsx
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import productos from "../data/productos";
+
+const API_URL = "http://18.232.140.10:8080/api/productos";
+
+// Mapea el producto que viene de la API al formato usado por las cards
+function mapProductoFromApi(p = {}) {
+  const variantes = Array.isArray(p.variantes) ? p.variantes : [];
+  const v = variantes[0] || {};
+
+  return {
+    id: p.id ?? v.id ?? null,
+    titulo: p.nombre ?? v.titulo ?? "Producto",
+    descripcion: p.descripcion ?? p.marca ?? "",
+    precio: Number(v.precio ?? 0),
+    imgSrc: v.imgSrc ?? "/assets/img/placeholder-product.svg",
+    altText: v.altText ?? (p.nombre || "Producto SneakerVibe"),
+    categoriaNombre:
+      p.categoria?.nombreCategoria ||
+      p.categoria?.nombre ||
+      p.categoria ||
+      "",
+  };
+}
 
 export default function CategoriaDetalle() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const categoria = searchParams.get("nombre");
+  const categoriaParam = (searchParams.get("nombre") || "").toLowerCase();
 
-  // Filtrar productos según categoría
-  const productosFiltrados = productos.filter(
-    (p) => p.categoria === categoria
-  );
+  const [productosFiltrados, setProductosFiltrados] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  if (productosFiltrados.length === 0) {
+  useEffect(() => {
+    async function fetchProductos() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const res = await fetch(API_URL);
+        if (!res.ok) {
+          throw new Error(`Error HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        const normalizados = Array.isArray(data)
+          ? data.map(mapProductoFromApi)
+          : [];
+
+        // Filtrar por categoría según el nombre que viene en la URL (?nombre=zapatillas)
+        const filtrados = normalizados.filter((p) => {
+          const catSlug = (p.categoriaNombre || "").toLowerCase();
+          return catSlug === categoriaParam;
+        });
+
+        setProductosFiltrados(filtrados);
+      } catch (err) {
+        console.error("Error al cargar productos por categoría:", err);
+        setError("No se pudieron cargar los productos de esta categoría.");
+        setProductosFiltrados([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (categoriaParam) {
+      fetchProductos();
+    } else {
+      setLoading(false);
+      setProductosFiltrados([]);
+    }
+  }, [categoriaParam]);
+
+  if (loading) {
     return (
-      <div className="container py-5 text-center">
-        <h2>Categoría no encontrada</h2>
-        <p>No hay productos disponibles en esta categoría.</p>
-      </div>
+      <main className="flex-grow-1">
+        <div className="container-fluid my-5">
+          <div className="row justify-content-around w-100 mx-0">
+            <div className="col-12 text-center text-muted py-5">
+              Cargando productos...
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="flex-grow-1">
+        <div className="container-fluid my-5">
+          <div className="row justify-content-around w-100 mx-0">
+            <div className="col-12 text-center text-danger py-5">
+              {error}
+            </div>
+          </div>
+        </div>
+      </main>
     );
   }
 
   return (
     <main className="flex-grow-1">
-      <div className="container my-5">
-        <h2 className="text-center text-capitalize mb-5">
-          {categoria}
-        </h2>
-
+      <div className="container-fluid my-5">
         <div className="row justify-content-around w-100 mx-0">
           {productosFiltrados.map((p) => (
             <div
@@ -45,12 +121,12 @@ export default function CategoriaDetalle() {
                     <h5 className="card-title">{p.titulo}</h5>
                     <p className="card-text">{p.descripcion}</p>
                     <p className="text-danger font-weight-bold">
-                      ${p.precio.toLocaleString("es-CL")}
+                      ${p.precio}
                     </p>
                   </div>
                   <a
                     href={`/product?id=${p.id}`}
-                    className="btn btn-dark mt-3"
+                    className="btn btn-danger mt-3"
                   >
                     Ver producto
                   </a>
@@ -58,6 +134,12 @@ export default function CategoriaDetalle() {
               </div>
             </div>
           ))}
+
+          {productosFiltrados.length === 0 && !error && (
+            <div className="col-12 text-center text-muted py-5">
+              No hay productos disponibles en esta categoría.
+            </div>
+          )}
         </div>
       </div>
     </main>

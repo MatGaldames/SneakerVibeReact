@@ -18,7 +18,6 @@ import AdminProductos from "./pages/ProductosAdmin";
 import AdminUsuarios from "./pages/AdminUsuarios";
 import BoletasPage from "./pages/BoletaAdmin";
 import AdminBoletaView from "./pages/BoletaVista";
-import Libros from "./pages/Libros";
 
 
 export default function Router() {
@@ -35,7 +34,6 @@ export default function Router() {
           <Route path="categoria" element={<CategoriaDetalle />} />
           <Route path="carrito" element={<Carrito />} />
           <Route path="blog" element={<Blog />} />
-          <Route path="libros" element={<Libros />}/>
           <Route path="/admin/agregarProducto" element={<AgregarProductos />} />
           <Route path="admin/dashboard" element={<HomeAdmin />} />
           <Route path="admin/productos" element={<AdminProductos />} />

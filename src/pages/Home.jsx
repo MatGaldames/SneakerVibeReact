@@ -1,9 +1,69 @@
 // src/Home.jsx
-import React from "react";
-import categorias from "../data/categorias";
+import React, { useEffect, useState } from "react";
 
+const API_CATEGORIAS = "http://18.232.140.10:8080/api/categorias";
+
+// Adaptar la categoría que viene de la API al formato usado por la UI
+function mapCategoriaFromApi(c = {}) {
+  const nombre =
+    c.nombreCategoria || c.nombre || c.titulo || "Categoría";
+
+  const slug = nombre.toLowerCase();
+
+  const assetMap = {
+    ropa: {
+      imgSrc: "/assets/img/ropa-index.png",
+      href: "/ropa",
+    },
+    zapatillas: {
+      imgSrc: "/assets/img/zapatillas-index.png",
+      href: "/productos",
+    },
+    accesorios: {
+      imgSrc: "/assets/img/accesorios-index.png",
+      href: "/accesorios",
+    },
+  };
+
+  const asset = assetMap[slug] || {
+    imgSrc: "/assets/img/placeholder-category.png",
+    href: `/categoria?nombre=${encodeURIComponent(slug)}`,
+  };
+
+  return {
+    id: c.id,
+    titulo: nombre,
+    nombre: nombre,
+    imgSrc: asset.imgSrc,
+    altText: `Categoría ${nombre}`,
+    href: asset.href,
+  };
+}
 
 export default function Home() {
+  const [categorias, setCategorias] = useState([]);
+
+  useEffect(() => {
+    async function fetchCategorias() {
+      try {
+        const res = await fetch(API_CATEGORIAS);
+        if (!res.ok) {
+          throw new Error("Error HTTP " + res.status);
+        }
+        const data = await res.json();
+        const mapeadas = Array.isArray(data)
+          ? data.map(mapCategoriaFromApi)
+          : [];
+        setCategorias(mapeadas);
+      } catch (err) {
+        console.error("Error al cargar categorías desde la API:", err);
+        setCategorias([]);
+      }
+    }
+
+    fetchCategorias();
+  }, []);
+
   return (
     <main className="flex-grow-1">
       <div className="container my-5">
@@ -32,7 +92,6 @@ export default function Home() {
               ></video>
             </div>
           </div>
-
         </div>
       </div>
 
