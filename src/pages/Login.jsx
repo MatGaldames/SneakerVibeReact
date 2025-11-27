@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { validarLogin } from "../assets/validaciones/login";
-import { autenticarConArray } from "../utilidades/autenticacion";
+import { autenticarConApi } from "../utilidades/autenticacion";
 import { Link, useNavigate } from "react-router-dom";
 
 
@@ -27,7 +27,7 @@ export default function Login({ bgUrl = "/assets/img/auth-bg.jpg" }) {
     setErrores(validarLogin(form));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // 1) Validación del formulario
@@ -35,18 +35,27 @@ export default function Login({ bgUrl = "/assets/img/auth-bg.jpg" }) {
     setErrores(errs);
     if (Object.keys(errs).length > 0) return;
 
-    // 2) Autenticación centralizada (ya filtra eliminados por sesión)
-    const res = autenticarConArray({ correo: form.correo, password: form.password });
+    // 2) Autenticación contra la API
+    const res = await autenticarConApi({
+      correo: form.correo,
+      password: form.password,
+    });
 
     if (!res.ok) {
       setErrores({ general: res.error || "Correo y/o contraseña inválidos." });
       return;
     }
 
-    // 3) Éxito → redirige (ajusta la ruta si quieres otra)
-    const rol = res.usuario?.rol ?? res.usuario?.role ?? "cliente";
-    navigate(rol === "admin" ? "/admin/dashboard" : "/");
+    // 3) Éxito → redirige
+    const usuario = res.usuario || {};
+    const esAdmin =
+      usuario.esAdmin === true ||
+      usuario.rol === "admin" ||
+      usuario.role === "admin";
+
+    navigate(esAdmin ? "/admin/dashboard" : "/");
   };
+
 
 
 

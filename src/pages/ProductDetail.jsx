@@ -218,7 +218,7 @@ export default function ProductDetail() {
                     </div>
                     <Link
                       to={`/product?id=${p.id}`}
-                      className="btn btn-dark mt-3"
+                      className="btn btn-danger mt-3"
                     >
                       Ver producto
                     </Link>

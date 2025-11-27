@@ -1,87 +1,74 @@
 // src/utilidades/registro.js
-// Registro de usuarios "comun" con ID autoincremental user-XYZ (3 dígitos).
+// Registro de usuarios "comun" usando la API real (sin arrays locales).
 
-import usuariosSeed from "../data/usuarios";
 import { guardaSesion } from "./autenticacion";
 
-const CLAVE_USUARIOS_EXTRA = "sv_usuarios_extra";
+const API_URL = "http://18.232.140.10:8080/api/usuarios";
 
-// --- utilidades de almacenamiento ---
-function leerUsuariosExtra() {
-  const crudo = localStorage.getItem(CLAVE_USUARIOS_EXTRA);
-  if (!crudo) return [];
-  try {
-    const arr = JSON.parse(crudo);
-    return Array.isArray(arr) ? arr : [];
-  } catch {
-    return [];
-  }
-}
+export async function registrarUsuarioComun(datos, opciones = {}) {
+  const { autoLogin = true } = opciones;
 
-function guardarUsuariosExtra(arr) {
-  localStorage.setItem(CLAVE_USUARIOS_EXTRA, JSON.stringify(arr || []));
-}
+  const {
+    nombre,
+    apellido,
+    correo,
+    password,
+    direccion,
+    numeracion,
+    region,
+    comuna,
+  } = datos;
 
-// --- helpers de negocio ---
-function normalizarCorreo(correo = "") {
-  return String(correo).trim().toLowerCase();
-}
-
-function numeroDeUserId(id = "") {
-  const m = String(id).match(/^user-(\d{3})$/i);
-  return m ? parseInt(m[1], 10) : 0;
-}
-
-function generarSiguienteUserId() {
-  const extra = leerUsuariosExtra();
-  const todosUser = [
-    ...usuariosSeed.filter(u => /^user-\d{3}$/i.test(u.id)),
-    ...extra.filter(u => /^user-\d{3}$/i.test(u.id)),
-  ];
-  const maxNum = todosUser.reduce((acc, u) => {
-    const n = numeroDeUserId(u.id);
-    return n > acc ? n : acc;
-  }, 0);
-  const siguiente = String(maxNum + 1).padStart(3, "0"); // 001, 002, ...
-  return `user-${siguiente}`;
-}
-
-function correoExiste(correo) {
-  const c = normalizarCorreo(correo);
-  if (usuariosSeed.some(u => normalizarCorreo(u.correo) === c)) return true;
-  return leerUsuariosExtra().some(u => normalizarCorreo(u.correo) === c);
-}
-
-// --- API principal ---
-export function registrarUsuarioComun({ nombre, apellido, correo, password, direccion, numeracion, region, comuna }, { autoLogin = true } = {}) {
-  if (!nombre ||!apellido || !correo || !password || !direccion || !numeracion || !region || !comuna) {
-    return { ok: false, error: "Faltan datos obligatorios." };
-  }
-  if (correoExiste(correo)) {
-    return { ok: false, error: "Ya existe una cuenta registrada con ese correo." };
-  }
-
-  const nuevoUsuario = {
-    id: generarSiguienteUserId(),
-    nombre: String(nombre).trim(),
-    apellido: String(apellido).trim(),
-    correo: normalizarCorreo(correo),
-    password: String(password),  // demo: en prod se debe hashear
-    rol: "comun",
-    direccion: String(direccion).trim(),
-    numeracion: String(numeracion).trim(),
-    region: String(region).trim(),
-    comuna: String(comuna).trim(),
+  const payload = {
+    nombre: String(nombre || "").trim(),
+    apellido: String(apellido || "").trim(),
+    email: String(correo || "").trim().toLowerCase(),
+    contrasena: String(password || ""),
+    direccion: String(direccion || "").trim(),
+    numDomicilio: String(numeracion || "").trim(),
+    region: String(region || "").trim(),
+    comuna: String(comuna || "").trim(),
+    esAdmin: false, // registro desde la web = usuario cliente
   };
 
-  const extra = leerUsuariosExtra();
-  extra.push(nuevoUsuario);
-  guardarUsuariosExtra(extra);
-
-  if (autoLogin) {
-    guardaSesion(nuevoUsuario); // guarda en sesión (sin password en storage)
+  if (!payload.email || !payload.contrasena || !payload.nombre) {
+    return {
+      ok: false,
+      error: "Faltan datos obligatorios para el registro.",
+    };
   }
 
-  const { password: _omit, ...seguro } = nuevoUsuario;
-  return { ok: true, usuario: seguro };
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      let msg = "No se pudo completar el registro.";
+      try {
+        const body = await res.json();
+        if (body && body.message) msg = body.message;
+      } catch {
+        // si no viene JSON, dejamos el genérico
+      }
+      return { ok: false, error: msg };
+    }
+
+    const usuarioCreado = await res.json();
+
+    if (autoLogin) {
+      guardaSesion(usuarioCreado);
+    }
+
+    const { contrasena, password: _p, ...seguro } = usuarioCreado;
+    return { ok: true, usuario: seguro };
+  } catch (e) {
+    console.error("Error registrando usuario en API:", e);
+    return {
+      ok: false,
+      error: "Error de conexión con el servidor.",
+    };
+  }
 }

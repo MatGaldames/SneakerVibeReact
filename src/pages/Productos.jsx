@@ -8,11 +8,18 @@ function mapProducto(p) {
   const variantes = Array.isArray(p.variantes) ? p.variantes : [];
   const v = variantes[0] || {};
 
+  const precio = Number(v.precio ?? 0);
+  const precioOfertaRaw =
+    v.precioOferta !== null && v.precioOferta !== undefined
+      ? Number(v.precioOferta)
+      : null;
+
   return {
     id: p.id ?? v.id ?? null,
     titulo: p.nombre ?? v.titulo ?? "Producto",
     descripcion: p.descripcion ?? p.marca ?? "",
-    precio: Number(v.precio ?? 0),
+    precio,
+    precioOferta: precioOfertaRaw, // <-- la usamos solo para filtrar
     imgSrc: v.imgSrc ?? "/assets/img/placeholder-product.svg",
     altText: v.altText ?? (p.nombre || "Producto SneakerVibe"),
   };
@@ -31,7 +38,13 @@ export default function Productos() {
 
         const data = await res.json();
         const mapeados = Array.isArray(data) ? data.map(mapProducto) : [];
-        setProductos(mapeados);
+
+        // 🔥 Solo productos SIN oferta (precioOferta === null)
+        const sinOfertas = mapeados.filter(
+          (p) => p.precioOferta === null || Number.isNaN(p.precioOferta)
+        );
+
+        setProductos(sinOfertas);
       } catch (err) {
         console.error("Error al cargar productos desde la API:", err);
         setProductos([]); // deja la lista vacía -> mensaje "No hay productos disponibles"
@@ -41,7 +54,7 @@ export default function Productos() {
     fetchProductos();
   }, []);
 
-  // Si tenías filtros/búsqueda, acá los aplicas sobre productos
+  // Si después quieres filtros/búsquedas, se aplican sobre `productos`
   const productosVisibles = productos;
 
   return (
