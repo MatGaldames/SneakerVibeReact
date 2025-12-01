@@ -19,6 +19,8 @@ import AdminUsuarios from "./pages/AdminUsuarios";
 import BoletasPage from "./pages/BoletaAdmin";
 import AdminBoletaView from "./pages/BoletaVista";
 import Boleta from "./pages/Boleta";
+import Noticia1 from "./pages/Noticia1";
+import Noticia2 from "./pages/Noticia2";
 
 
 export default function Router() {
@@ -44,6 +46,8 @@ export default function Router() {
           <Route path="admin/ordenes" element={<BoletasPage />} />
           <Route path="/admin/boletas/:id" element={<AdminBoletaView />} />
           <Route path="boleta" element={<Boleta />} />
+          <Route path="blog/noticia1" element={<Noticia1 />} />
+          <Route path="blog/noticia2" element={<Noticia2 />} />
         </Route>
       </Routes>
     </BrowserRouter>

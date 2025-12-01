@@ -340,7 +340,7 @@ export default function Envio() {
                                         onChange={onChange}
                                     />
                                     <label className="form-check-label" htmlFor="simularRechazo">
-                                        Simular pago rechazado (solo prueba)
+                                        VALIDAR BOLETA
                                     </label>
                                 </div>
                                 <div className="d-flex justify-content-end">
