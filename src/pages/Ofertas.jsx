@@ -1,7 +1,7 @@
 // src/pages/Ofertas.jsx
 import React, { useEffect, useState } from "react";
 
-const API_URL = "http://18.232.140.10:8080/api/productos";
+const API_URL = "http://52.0.14.78:8080/api/productos";
 
 // Mapear producto desde la API
 function mapProductoFromApi(p = {}) {
@@ -98,7 +98,7 @@ export default function Ofertas() {
   return (
     <main className="flex-grow-1">
       <div className="container-fluid my-5">
-        <h2 className="text-center mb-4">Ofertas</h2>
+        <h2 className="text-center mb-4">Ofertas BLACK FRIDAY</h2>
         <div className="row justify-content-around w-100 mx-0">
           {ofertas.map((p) => {
             const ahorro =

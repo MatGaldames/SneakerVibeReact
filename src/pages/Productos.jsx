@@ -1,7 +1,7 @@
 // src/pages/Productos.jsx
 import React, { useEffect, useState } from "react";
 
-const API_URL = "http://18.232.140.10:8080/api/productos";
+const API_URL = "http://52.0.14.78:8080/api/productos";
 
 // Adaptamos el producto que viene de la API al shape que usa el JSX
 function mapProducto(p) {

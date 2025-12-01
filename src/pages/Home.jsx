@@ -1,7 +1,7 @@
 // src/Home.jsx
 import React, { useEffect, useState } from "react";
 
-const API_CATEGORIAS = "http://18.232.140.10:8080/api/categorias";
+const API_CATEGORIAS = "http://52.0.14.78:8080/api/categorias";
 
 // Adaptar la categoría que viene de la API al formato usado por la UI
 function mapCategoriaFromApi(c = {}) {

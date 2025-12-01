@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-const API_URL = "http://18.232.140.10:8080/api/productos";
+const API_URL = "http://52.0.14.78:8080/api/productos";
 
 // Mapea el producto que viene de la API al formato usado por las cards
 function mapProductoFromApi(p = {}) {

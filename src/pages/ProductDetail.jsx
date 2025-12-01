@@ -3,7 +3,7 @@ import { useCarrito } from "../utilidades/useCarrito";
 import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 
-const API_BASE = "http://18.232.140.10:8080/api";
+const API_BASE = "http://52.0.14.78:8080/api";
 
 // Mapea un Producto de la API al shape que usa la UI
 function mapProductoFromApi(p = {}) {
@@ -24,8 +24,8 @@ function mapProductoFromApi(p = {}) {
     tallas:
       variantes.length > 0
         ? variantes
-            .map((det) => det.talla)
-            .filter(Boolean)
+          .map((det) => det.talla)
+          .filter(Boolean)
         : [],
   };
 }

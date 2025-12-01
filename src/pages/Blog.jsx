@@ -1,5 +1,7 @@
 // src/Blog.jsx
 import React from "react";
+import { Link } from "react-router-dom";
+
 
 export default function Blog() {
   return (
@@ -18,9 +20,9 @@ export default function Blog() {
               zapatillas más vendidas de todos los tiempos. Cada año se lanzan
               nuevas ediciones.
             </p>
-            <a href="#" className="btn btn-danger mt-2">
+            <Link to="/blog/noticia1" className="btn btn-danger w-100">
               VER CASO
-            </a>
+            </Link>
           </div>
           <div className="col-md-6 text-center">
             <img
@@ -42,9 +44,9 @@ export default function Blog() {
               zapatillas limitadas puede multiplicar su precio hasta 10 veces.
               ¡Un sneaker puede ser mejor inversión que el oro!
             </p>
-            <a href="#" className="btn btn-danger mt-2">
+            <Link to="/blog/noticia2" className="btn btn-danger w-100">
               VER CASO
-            </a>
+            </Link>
           </div>
           <div className="col-md-6 text-center">
             <img
