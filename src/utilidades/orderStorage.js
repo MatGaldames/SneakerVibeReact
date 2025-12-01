@@ -37,6 +37,18 @@ export function getOrderById(id) {
   return getAllOrders().find((o) => o.id === id) || null;
 }
 
+export function getLastOrder() {
+  try {
+    const current = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    if (!Array.isArray(current) || current.length === 0) return null;
+
+    // devolvemos la ÚLTIMA orden guardada (la compra más reciente)
+    return current[current.length - 1];
+  } catch {
+    return null;
+  }
+}
+
 function normalizeOrder(o) {
   // Orden completa
   if (o && o.customer && o.items && o.totals) {

@@ -5,6 +5,7 @@ import { clp } from "../assets/hooks/currency.js";
 import { useCarrito } from "../utilidades/useCarrito.js";
 import productos from "../data/productos.js";
 import { saveOrder } from "../utilidades/orderStorage.js";
+import { useNavigate } from "react-router-dom";
 
 function ValidacionTexto({ error }) {
     return error ? <div className="invalid-feedback d-block">{error}</div> : null;
@@ -24,6 +25,7 @@ function validarCheckout(f) {
 
 
 export default function Envio() {
+    const navigate = useNavigate();
 
     const [compra, setCompra] = useState(null);
     // null → no muestra nada, "ok" → éxito, "error" → rechazado
@@ -37,7 +39,8 @@ export default function Envio() {
 
     const [form, setForm] = useState({
         nombre: "", apellidos: "", correo: "",
-        calle: "", depto: "", region: "", comuna: "", indicaciones: ""
+        calle: "", depto: "", region: "", comuna: "", indicaciones: "",
+        simularRechazo: false,
     });
     const [err, setErr] = useState({});
 
@@ -75,9 +78,14 @@ export default function Envio() {
     }, []);
 
     const onChange = (e) => {
-        const { id, value } = e.target;
-        setForm((s) => ({ ...s, [id]: value }));
+        const { id, value, type, checked } = e.target;
+        setForm((s) => ({
+            ...s,
+            [id]: type === "checkbox" ? checked : value
+        }));
     };
+
+
 
     const onSubmitCheckout = (e) => {
         e.preventDefault();
@@ -96,9 +104,12 @@ export default function Envio() {
             .replace(/-/g, "") + Math.floor(100 + Math.random() * 900);
         const orderCode = "ORDER" + Math.floor(10000 + Math.random() * 90000);
 
+        const estado = form.simularRechazo ? "rechazada" : "aprobada";
+
         const newOrder = {
             id: orderNumber,
             code: orderCode,
+            status: estado,
             cliente: {
                 nombre: form.nombre,
                 apellidos: form.apellidos,
@@ -115,12 +126,24 @@ export default function Envio() {
         // Guarda la orden localmente
         saveOrder(newOrder);
 
-        // Limpia el carrito si quieres
+        if (!form.simularRechazo) {
+            clear();
+        }
+
+        // (Opcional) Limpia el carrito
         clear();
 
-        // Muestra el banner con los datos
+        // Muestra banner (si quieres seguir usándolo)
         setCompra({ status: "ok", orderNumber, orderCode });
+
+        // 👇👈 AQUÍ GENERAS LA BOLETA: te vas a la página Boleta
+        navigate("/boleta", {
+            state: {
+                orderId: newOrder,
+            },
+        });
     };
+
 
     const getThumb = (it) => {
         if (it?.imgSrc) return { src: it.imgSrc, alt: it.altText || it.titulo || it.id, titulo: it.titulo || it.id };
@@ -308,9 +331,21 @@ export default function Envio() {
                                             placeholder="Entre calles, sin timbre, etc." />
                                     </div>
                                 </div>
-
+                                <div className="form-check mb-3">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="simularRechazo"
+                                        checked={form.simularRechazo}
+                                        onChange={onChange}
+                                    />
+                                    <label className="form-check-label" htmlFor="simularRechazo">
+                                        Simular pago rechazado (solo prueba)
+                                    </label>
+                                </div>
                                 <div className="d-flex justify-content-end">
-                                    <button className="btn btn-danger">
+                                    <button className="btn btn-danger"
+                                    >
                                         Pagar ahora {clp.format(resumen.total)}
                                     </button>
                                 </div>

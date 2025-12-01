@@ -1,7 +1,74 @@
-import React from "react";
-import ofertas from "../data/ofertas";
+import React, { useEffect, useState } from "react";
+
+const API_URL = "http://18.232.140.10:8080/api";
 
 export default function Ofertas() {
+  const [ofertas, setOfertas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        const resp = await fetch(`${API_URL}/productos`);
+        if (!resp.ok) throw new Error("Error al cargar productos");
+        const data = await resp.json();
+
+        // 1 card por producto
+        const productosConOferta = data
+          .map((producto) => {
+            // variantes que tienen precioOferta
+            const variantesConOferta = producto.variantes.filter(
+              (v) => v.precioOferta !== null && v.precioOferta !== undefined
+            );
+
+            // si no tiene variantes en oferta, descartamos el producto
+            if (variantesConOferta.length === 0) return null;
+
+            // tomamos la primera variante en oferta como referencia
+            const v = variantesConOferta[0];
+
+            return {
+              id: producto.id,              // id del producto
+              titulo: producto.nombre,
+              descripcion: producto.descripcion,
+              imgSrc: v.imgSrc,
+              href: v.href,
+              altText: v.altText,
+              precio: v.precio,
+              precioOferta: v.precioOferta,
+              marca: producto.marca,
+              categoria: producto.categoria?.nombreCategoria,
+            };
+          })
+          .filter(Boolean); // elimina los null
+
+        setOfertas(productosConOferta);
+      } catch (err) {
+        console.error(err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProductos();
+  }, []);
+
+
+  if (loading) {
+    return <main className="flex-grow-1 p-5">Cargando ofertas...</main>;
+  }
+
+  if (error) {
+    return (
+      <main className="flex-grow-1 p-5">
+        <p className="text-danger">Error: {error}</p>
+      </main>
+    );
+  }
+
+  // 👉 AQUÍ va el return con el map adentro
   return (
     <main className="flex-grow-1">
       <div className="container-fluid my-5">
@@ -38,20 +105,20 @@ export default function Ofertas() {
                       {tieneOferta ? (
                         <>
                           <p className="text-muted text-decoration-line-through mb-1">
-                            ${o.precio.toLocaleString("es-CL")}
+                            ${Number(o.precio).toLocaleString("es-CL")}
                           </p>
                           <p className="text-danger fw-bold">
-                            ${o.precioOferta.toLocaleString("es-CL")}
+                            ${Number(o.precioOferta).toLocaleString("es-CL")}
                           </p>
                         </>
                       ) : (
                         <p className="text-danger fw-bold">
-                          ${o.precio.toLocaleString("es-CL")}
+                          ${Number(o.precio).toLocaleString("es-CL")}
                         </p>
                       )}
                     </div>
                     <a
-                      href={`/product?id=${o.id}`}
+                      href={o.href}
                       className="btn btn-dark mt-3"
                     >
                       Ver producto
