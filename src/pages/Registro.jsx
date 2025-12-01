@@ -20,32 +20,36 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
     setErrores(validarRegistro(form));
   };
 
-  const manejarEnviar = (e) => {
+  const manejarEnviar = async (e) => {
     e.preventDefault();
     const val = validarRegistro(form);
     setErrores(val);
-    if (Object.keys(val).length === 0) {
-      // Registrar (rol "comun", id auto user-XYZ) + auto-login
-      const { ok, error } = registrarUsuarioComun({
+
+    if (Object.keys(val).length !== 0) return;
+
+    const { ok, error } = await registrarUsuarioComun(
+      {
         nombre: form.nombre,
         apellido: form.apellido,
         correo: form.correo,
         password: form.password,
-        direccion: form.confirmCalle,
+        direccion: form.confirmCalle, // así lo tenías mapeado
         numeracion: form.numeracion,
         region: form.region,
-        comuna: form.comuna
-      }, { autoLogin: true });
+        comuna: form.comuna,
+      },
+      { autoLogin: true }
+    );
 
-      if (!ok) {
-        setMensajeGeneral(error || "No se pudo completar el registro.");
-        return;
-      }
-
-      // Ir a Home: Navbar ya debería saludar
-      navigate("/", { replace: true });
+    if (!ok) {
+      setMensajeGeneral(error || "No se pudo completar el registro.");
+      return;
     }
+
+    // Ir a Home: Navbar ya debería saludar con el nombre
+    navigate("/", { replace: true });
   };
+
 
   return (
     <main
@@ -62,7 +66,7 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
       <div className="container position-relative">
         <div className="row justify-content-center">
           <div className="col-12 col-sm-10 col-md-8 col-lg-5">
-            <div className="card shadow-lg p-4 border-0 rounded-4">
+            <div className="card shadow-lg my-5 p-4 border-0 rounded-4">
               <h3 className="text-center mb-4 text-danger">Crear Cuenta</h3>
 
               

@@ -1,94 +1,99 @@
-import usuarios from "../data/usuarios";
-import { loadDeletedUsers, getStableUserId } from "./deletedUsersSession";
+// src/utilidades/autenticacion.js
+// Autenticación contra la API real de usuarios (sin arrays ni "semillas" locales).
+
+const API_URL = "http://18.232.140.10:8080/api/usuarios";
 
 const CLAVE_SESION = "sv_usuario";
-const CLAVE_USUARIOS_EXTRA = "sv_usuarios_extra";
 
-function leerUsuariosExtra() {
-  // Clave actual
-  const actual = localStorage.getItem(CLAVE_USUARIOS_EXTRA);
-  // Clave legacy (por si se usó antes)
-  const legacy = localStorage.getItem("usuarios");
-
-  const parse = (txt) => {
-    if (!txt) return [];
-    try {
-      const arr = JSON.parse(txt);
-      return Array.isArray(arr) ? arr : [];
-    } catch {
-      return [];
-    }
-  };
-
-  // Merge de ambos, evitando duplicados por correo
-  const a = parse(actual);
-  const b = parse(legacy);
-  const byMail = (u) => String(u?.correo || u?.email || "").toLowerCase();
-  const map = new Map();
-
-  [...a, ...b].forEach((u) => {
-    const k = byMail(u);
-    if (k) map.set(k, u);
-  });
-
-  return [...map.values()];
-}
-
-
-function notificarCambioSesion() {
-  window.dispatchEvent(new Event("sv_sesion_cambio"));
-}
-
-export function guardaSesion(usuario) {
-  if (!usuario) return;
-  const { password, ...seguro } = usuario;
-  localStorage.setItem(CLAVE_SESION, JSON.stringify(seguro));
-  notificarCambioSesion();
-}
-
+// -------------------------
+// Sesión en localStorage
+// -------------------------
 export function leeSesion() {
-  const crudo = localStorage.getItem(CLAVE_SESION);
-  if (!crudo) return null;
   try {
-    return JSON.parse(crudo);
+    const raw = localStorage.getItem(CLAVE_SESION);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    return obj && typeof obj === "object" ? obj : null;
   } catch {
     return null;
   }
 }
 
-export function borraSesion() {
-  localStorage.removeItem(CLAVE_SESION);
-  notificarCambioSesion();
+export function guardaSesion(usuario) {
+  if (!usuario) {
+    borraSesion();
+    return;
+  }
+
+  const seguro = { ...usuario };
+  // Nunca guardamos la contraseña en storage
+  if ("contrasena" in seguro) delete seguro.contrasena;
+  if ("password" in seguro) delete seguro.password;
+
+  localStorage.setItem(CLAVE_SESION, JSON.stringify(seguro));
+
+  // Notificar a otros componentes (Navbar) vía evento de storage
+  try {
+    window.dispatchEvent(
+      new StorageEvent("storage", {
+        key: CLAVE_SESION,
+        newValue: JSON.stringify(seguro),
+      })
+    );
+  } catch {
+    // Algunos navegadores no permiten construir StorageEvent a mano, no pasa nada.
+  }
 }
 
-export function autenticarConArray({ correo, password }) {
-  const correoNorm = String(correo || "").trim().toLowerCase();
+export function borraSesion() {
+  localStorage.removeItem(CLAVE_SESION);
+  try {
+    window.dispatchEvent(
+      new StorageEvent("storage", { key: CLAVE_SESION, newValue: null })
+    );
+  } catch { }
+}
+
+// -------------------------
+// Login contra la API
+// -------------------------
+export async function autenticarConApi({ correo, password }) {
+  const email = String(correo || "").trim().toLowerCase();
   const pass = String(password || "");
 
-  // incluir usuarios registrados en LocalStorage
-  const usuariosExtra = leerUsuariosExtra();
-  const todos = [...usuarios, ...usuariosExtra];
-
-  const usuario = todos.find(
-    (u) => String(u.correo).toLowerCase() === correoNorm && String(u.password) === pass
-  );
-
-  if (!usuario) {
-    return { ok: false, error: "Credenciales inválidas." };
+  if (!email || !pass) {
+    return { ok: false, error: "Debes ingresar correo y contraseña." };
   }
 
-  // usuario encontrado por credenciales
-  // Bloqueo por eliminación en la sesión de admin
-  const deleted = loadDeletedUsers();
-  if (deleted.has(getStableUserId(usuario))) {
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) {
+      return {
+        ok: false,
+        error: "Error al conectar con el servidor. Intenta más tarde.",
+      };
+    }
+
+    const data = await res.json();
+    const lista = Array.isArray(data) ? data : [];
+
+    const usuario = lista.find((u) => {
+      const uMail = String(u.email || "").trim().toLowerCase();
+      const uPass = String(u.contrasena || u.password || "");
+      return uMail === email && uPass === pass;
+    });
+
+    if (!usuario) {
+      return { ok: false, error: "Correo y/o contraseña inválidos." };
+    }
+
+    guardaSesion(usuario);
+    return { ok: true, usuario: leeSesion() };
+  } catch (e) {
+    console.error("Error autenticando contra API:", e);
     return {
       ok: false,
-      error:
-        "Tu cuenta fue deshabilitada temporalmente.",
+      error: "No se pudo conectar con el servidor.",
     };
   }
-
-  // OK
-  guardaSesion(usuario);
-  return { ok: true, usuario: leeSesion() };
 }

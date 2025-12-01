@@ -1,14 +1,61 @@
-import React from "react";
-import productos from "../data/productos";
-import { loadDeleted, getStableId } from "../utilidades/deletedProductsSession"; // <-- ajusta ruta si es necesario
+// src/pages/Productos.jsx
+import React, { useEffect, useState } from "react";
+
+const API_URL = "http://18.232.140.10:8080/api/productos";
+
+// Adaptamos el producto que viene de la API al shape que usa el JSX
+function mapProducto(p) {
+  const variantes = Array.isArray(p.variantes) ? p.variantes : [];
+  const v = variantes[0] || {};
+
+  const precio = Number(v.precio ?? 0);
+  const precioOfertaRaw =
+    v.precioOferta !== null && v.precioOferta !== undefined
+      ? Number(v.precioOferta)
+      : null;
+
+  return {
+    id: p.id ?? v.id ?? null,
+    titulo: p.nombre ?? v.titulo ?? "Producto",
+    descripcion: p.descripcion ?? p.marca ?? "",
+    precio,
+    precioOferta: precioOfertaRaw, // <-- la usamos solo para filtrar
+    imgSrc: v.imgSrc ?? "/assets/img/placeholder-product.svg",
+    altText: v.altText ?? (p.nombre || "Producto SneakerVibe"),
+  };
+}
 
 export default function Productos() {
-  // Cargamos los IDs eliminados por el admin en esta sesión
-  const deleted = loadDeleted();
+  const [productos, setProductos] = useState([]);
 
-  // Filtramos los productos usando el mismo ID estable que usa el admin
-  const productosVisibles = (productos || []).filter((p, i) => !deleted.has(getStableId(p, i)));
+  useEffect(() => {
+    async function fetchProductos() {
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) {
+          throw new Error(`Error HTTP ${res.status}`);
+        }
 
+        const data = await res.json();
+        const mapeados = Array.isArray(data) ? data.map(mapProducto) : [];
+
+        // 🔥 Solo productos SIN oferta (precioOferta === null)
+        const sinOfertas = mapeados.filter(
+          (p) => p.precioOferta === null || Number.isNaN(p.precioOferta)
+        );
+
+        setProductos(sinOfertas);
+      } catch (err) {
+        console.error("Error al cargar productos desde la API:", err);
+        setProductos([]); // deja la lista vacía -> mensaje "No hay productos disponibles"
+      }
+    }
+
+    fetchProductos();
+  }, []);
+
+  // Si después quieres filtros/búsquedas, se aplican sobre `productos`
+  const productosVisibles = productos;
 
   return (
     <main className="flex-grow-1">
@@ -33,7 +80,10 @@ export default function Productos() {
                       ${p.precio}
                     </p>
                   </div>
-                  <a href={`/product?id=${p.id}`} className="btn btn-dark mt-3">
+                  <a
+                    href={`/product?id=${p.id}`}
+                    className="btn btn-danger mt-3"
+                  >
                     Ver producto
                   </a>
                 </div>
