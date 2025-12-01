@@ -69,6 +69,7 @@ export default function Registro({ bgUrl = "/assets/img/auth-bg.jpg" }) {
             <div className="card shadow-lg my-5 p-4 border-0 rounded-4">
               <h3 className="text-center mb-4 text-danger">Crear Cuenta</h3>
 
+              
               <form onSubmit={manejarEnviar} noValidate>
                 <div className="mb-3">
                   <label htmlFor="RegNombre" className="form-label fw-semibold">
