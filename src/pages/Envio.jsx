@@ -127,21 +127,9 @@ export default function Envio() {
         // Guarda la orden localmente
         saveOrder(newOrder);
 
-        // Guarda la orden en la BD
-        createPedido(newOrder).then((res) => {
-            if (res) {
-                console.log("Pedido guardado en BD:", res);
-            } else {
-                console.error("No se pudo guardar el pedido en la BD");
-            }
-        });
-
         if (!form.simularRechazo) {
             clear();
         }
-
-        // (Opcional) Limpia el carrito
-        clear();
 
         // Muestra banner (si quieres seguir usándolo)
         setCompra({ status: "ok", orderNumber, orderCode });
@@ -149,7 +137,7 @@ export default function Envio() {
         // 👇👈 AQUÍ GENERAS LA BOLETA: te vas a la página Boleta
         navigate("/boleta", {
             state: {
-                orderId: newOrder,
+                orderId: newOrder
             },
         });
     };
@@ -350,7 +338,7 @@ export default function Envio() {
                                         onChange={onChange}
                                     />
                                     <label className="form-check-label" htmlFor="simularRechazo">
-                                        VALIDAR BOLETA
+                                        RECHAZAR BOLETA
                                     </label>
                                 </div>
                                 <div className="d-flex justify-content-end">

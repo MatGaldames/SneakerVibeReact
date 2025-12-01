@@ -1,7 +1,7 @@
 // src/pages/admin/AdminBoletaView.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getPedidoById } from "../services/pedidoService";
+import { getAllOrders } from "../utilidades/orderStorage";
 import Boleta from "../componentes/Boleta";
 
 export default function AdminBoletaView() {
@@ -11,13 +11,12 @@ export default function AdminBoletaView() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchOrder() {
-      setLoading(true);
-      const data = await getPedidoById(id);
-      setOrder(data);
-      setLoading(false);
-    }
-    fetchOrder();
+    setLoading(true);
+    const all = getAllOrders();
+    // Buscamos por id o por code, según lo que venga en la URL
+    const found = all.find((o) => String(o.id) === id || String(o.code) === id);
+    setOrder(found || null);
+    setLoading(false);
   }, [id]);
 
   if (loading) {

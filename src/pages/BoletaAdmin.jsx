@@ -1,20 +1,18 @@
 // src/pages/admin/AdminOrders.jsx
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getPedidos } from "../services/pedidoService";
+import { getAllOrders } from "../utilidades/orderStorage";
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchOrders() {
-      setLoading(true);
-      const data = await getPedidos();
-      setOrders(data);
-      setLoading(false);
-    }
-    fetchOrders();
+    // Simulamos carga asíncrona para mantener consistencia visual
+    setLoading(true);
+    const data = getAllOrders();
+    setOrders(data);
+    setLoading(false);
   }, []);
 
   if (loading) {

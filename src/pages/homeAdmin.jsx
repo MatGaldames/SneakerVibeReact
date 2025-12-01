@@ -1,48 +1,54 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import DashboardSidebar from "../componentes/Dashboard";
-import productosData from "../data/productos";
-import usuariosData from "../data/usuarios";
-import { loadDeleted, getStableId } from "../utilidades/deletedProductsSession";
-import { loadDeletedUsers, getStableUserId } from "../utilidades/deletedUsersSession";
-
-// Lee usuarios creados en localStorage (clave actual y legacy) y deduplica por correo
-const leerUsuariosExtraLocal = () => {
-  const parse = (txt) => {
-    try {
-      const arr = JSON.parse(txt || "[]");
-      return Array.isArray(arr) ? arr : [];
-    } catch {
-      return [];
-    }
-  };
-  const actuales = parse(localStorage.getItem("sv_usuarios_extra"));
-  const legacy   = parse(localStorage.getItem("usuarios"));
-
-  const key = (u) => String(u?.correo ?? u?.email ?? "").toLowerCase();
-  const map = new Map();
-  [...actuales, ...legacy].forEach((u) => {
-    const k = key(u);
-    if (k) map.set(k, u);
-  });
-  return [...map.values()];
-};
+import { getProductos } from "../services/productoService";
+import { getUsuarios } from "../services/usuarioService";
+import { getAllOrders } from "../utilidades/orderStorage";
+import { loadDeleted } from "../utilidades/deletedProductsSession";
+import { loadDeletedUsers } from "../utilidades/deletedUsersSession";
 
 export default function HomeAdmin() {
   const active = "dashboard";
   const nf = new Intl.NumberFormat("es-CL");
 
-  // Productos visibles (descontando eliminados en la sesión)
-  const productCount = React.useMemo(() => {
-    const deleted = loadDeleted();
-    return (productosData || []).filter((p, i) => !deleted.has(getStableId(p, i))).length;
-  }, []);
+  const [counts, setCounts] = useState({
+    usuarios: 0,
+    pedidos: 0,
+    productos: 0,
+    reportes: 0
+  });
 
-  // Usuarios visibles (seed + registrados en localStorage, descontando eliminados en la sesión)
-  const userCount = React.useMemo(() => {
-    const deleted = loadDeletedUsers();
-    const extras  = leerUsuariosExtraLocal();
-    const all     = [...(usuariosData || []), ...extras];
-    return all.filter((u, i) => !deleted.has(getStableUserId(u, i))).length;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [usersData, productsData] = await Promise.all([
+          getUsuarios(),
+          getProductos()
+        ]);
+        
+        const ordersData = getAllOrders();
+
+        const deletedUsers = loadDeletedUsers();
+        const deletedProducts = loadDeleted();
+
+        // Filter users
+        const visibleUsers = (usersData || []).filter(u => !deletedUsers.has(u.id));
+        
+        // Filter products
+        const visibleProducts = (productsData || []).filter(p => !deletedProducts.has(p.id));
+
+        setCounts({
+          usuarios: visibleUsers.length,
+          productos: visibleProducts.length,
+          pedidos: (ordersData || []).length,
+          reportes: 0
+        });
+
+      } catch (error) {
+        console.error("Error fetching dashboard data", error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
@@ -84,10 +90,10 @@ export default function HomeAdmin() {
           {/* KPIs superiores */}
           <div className="row g-3 mb-4">
             {[
-              { icon: "bi-people",      value: nf.format(userCount),  label: "Usuarios",  href: "/admin/usuarios"  },
-              { icon: "bi-receipt",     value: "2",               label: "Pedidos",   href: "/admin/ordenes"   },
-              { icon: "bi-bag",         value: nf.format(productCount), label: "Productos", href: "/admin/productos" },
-              { icon: "bi-info-square", value: "0",                 label: "Reportes",  href: "/admin/reportes"  },
+              { icon: "bi-people",      value: nf.format(counts.usuarios),  label: "Usuarios",  href: "/admin/usuarios"  },
+              { icon: "bi-receipt",     value: nf.format(counts.pedidos),   label: "Pedidos",   href: "/admin/ordenes"   },
+              { icon: "bi-bag",         value: nf.format(counts.productos), label: "Productos", href: "/admin/productos" },
+              { icon: "bi-info-square", value: nf.format(counts.reportes),  label: "Reportes",  href: "/admin/reportes"  },
             ].map((k, i) => (
               <div className="col-12 col-sm-6 col-lg-3" key={i}>
                 <div className="card h-100 border-0 text-center neon-card">

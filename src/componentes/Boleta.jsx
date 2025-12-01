@@ -1,26 +1,24 @@
 // src/components/Boleta.jsx
 import React, { useRef } from "react";
-import AdminOrders from "../pages/BoletaAdmin";
-import AdminBoletaView from "../pages/BoletaVista";
 
 export default function Boleta({ order, onClose }) {
   const ref = useRef(null);
 
   if (!order) return null;
 
-  // Adaptar estructura (Envio.jsx vs Legacy)
-  const cliente = order.cliente || order.customer || {};
-  const direccion = typeof cliente.direccion === 'string' 
-    ? { calle: cliente.direccion } 
-    : (cliente.direccion || {});
-  
+  // Adaptar estructura (Envio.jsx)
+  const cliente = order.cliente || {};
   const items = order.items || [];
-  const total = order.total || order.totals?.total || 0;
-  const fecha = order.fecha || order.createdAt;
-  const numero = order.code || order.number || order.id;
+  const total = order.total || 0;
+  const fecha = order.fecha || "";
+  const numero = order.code || order.id || "---";
+
+  // Dirección viene como string en cliente.direccion
+  const direccionCompleta = cliente.direccion || "";
+  const comuna = cliente.comuna || "";
+  const region = cliente.region || "";
 
   const handlePrint = () => {
-    // Opción simple: usa window.print() y añade estilos @media print
     window.print();
   };
 
@@ -43,16 +41,12 @@ export default function Boleta({ order, onClose }) {
         <div className="card-body">
           <div className="mb-3">
             <h5 className="mb-1">Datos del Cliente</h5>
-            <div>{cliente.nombre} {cliente.apellidos || cliente.apellido}</div>
-            {cliente.rut && <div>RUT: {cliente.rut}</div>}
-            {cliente.correo || cliente.email && <div>Email: {cliente.correo || cliente.email}</div>}
-            {cliente.telefono && <div>Teléfono: {cliente.telefono}</div>}
+            <div>{cliente.nombre} {cliente.apellidos}</div>
+            {cliente.correo && <div>Email: {cliente.correo}</div>}
             <div>
-              Dirección: {direccion.calle} {direccion.numero} {direccion.depto ? `, Depto ${direccion.depto}` : ""}
-              {direccion.comuna ? `, ${direccion.comuna}` : ""}
-              {direccion.region ? `, ${direccion.region}` : ""}
-              {cliente.comuna ? `, ${cliente.comuna}` : ""}
-              {cliente.region ? `, ${cliente.region}` : ""}
+              Dirección: {direccionCompleta}
+              {comuna ? `, ${comuna}` : ""}
+              {region ? `, ${region}` : ""}
             </div>
           </div>
 
@@ -70,14 +64,13 @@ export default function Boleta({ order, onClose }) {
               <tbody>
                 {items.map((it, idx) => {
                   const nombre = it.titulo || it.nombre || "Producto";
-                  const cantidad = it.cantidad || it.qty || 0;
-                  const precio = it.precio || it.price || 0;
+                  const cantidad = it.cantidad || 1;
+                  const precio = it.precio || 0;
                   return (
                     <tr key={idx}>
                       <td>
                         {nombre}
                         {it.talla ? ` / Talla ${it.talla}` : ""}
-                        {it.color ? ` / ${it.color}` : ""}
                       </td>
                       <td>{cantidad}</td>
                       <td>${Number(precio).toLocaleString("es-CL")}</td>
@@ -93,7 +86,7 @@ export default function Boleta({ order, onClose }) {
           </div>
 
           <div className="d-flex justify-content-between">
-            <small>Fecha: {fecha ? new Date(fecha).toLocaleString() : "—"}</small>
+            <small>Fecha: {fecha}</small>
           </div>
         </div>
 
