@@ -1,7 +1,8 @@
 // src/utilidades/autenticacion.js
 // Autenticación contra la API real de usuarios (sin arrays ni "semillas" locales).
+import { isUserDeleted } from "./deletedUsersSession";
 
-const API_URL = "http://18.232.140.10:8080/api/usuarios";
+const API_URL = "http://52.0.14.78:8080/api/usuarios";
 
 const CLAVE_SESION = "sv_usuario";
 
@@ -85,6 +86,14 @@ export async function autenticarConApi({ correo, password }) {
 
     if (!usuario) {
       return { ok: false, error: "Correo y/o contraseña inválidos." };
+    }
+
+    // Verificar si está "soft deleted"
+    if (isUserDeleted(usuario.id)) {
+      return {
+        ok: false,
+        error: "Tu cuenta ha sido suspendida o eliminada. Contacta al administrador.",
+      };
     }
 
     guardaSesion(usuario);

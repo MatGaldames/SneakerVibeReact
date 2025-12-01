@@ -1,10 +1,25 @@
 // src/pages/admin/AdminOrders.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getAllOrders } from "../utilidades/orderStorage"; // <- ruta corregida
+import { getPedidos } from "../services/pedidoService";
 
 export default function AdminOrders() {
-  const orders = getAllOrders();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchOrders() {
+      setLoading(true);
+      const data = await getPedidos();
+      setOrders(data);
+      setLoading(false);
+    }
+    fetchOrders();
+  }, []);
+
+  if (loading) {
+    return <div className="container py-4">Cargando órdenes...</div>;
+  }
 
   return (
     <div className="container py-4">
@@ -20,22 +35,31 @@ export default function AdminOrders() {
           </tr>
         </thead>
         <tbody>
-          {orders.map((o) => (
-            <tr key={o.id}>
-              <td>{o.number}</td>
-              <td>{new Date(o.createdAt).toLocaleString()}</td>
-              <td>
-                {o.customer?.nombre} {o.customer?.apellido}
-                {o._legacy && <span className="badge bg-warning ms-2">LEGACY</span>}
-              </td>
-              <td>${Number(o.totals?.total ?? 0).toLocaleString("es-CL")}</td>
-              <td>
-                <Link to={`/admin/boletas/${o.id}`} className="btn btn-primary btn-sm">
-                  Ver boleta
-                </Link>
-              </td>
-            </tr>
-          ))}
+          {orders.map((o) => {
+            // Adaptamos campos según lo que guardamos en Envio.jsx
+            // newOrder = { id, code, cliente, total, fecha, ... }
+            const id = o.id || o.number;
+            const fecha = o.fecha || o.createdAt;
+            const clienteNombre = o.cliente?.nombre || o.customer?.nombre || "Anónimo";
+            const clienteApellido = o.cliente?.apellidos || o.customer?.apellido || "";
+            const total = o.total || o.totals?.total || 0;
+
+            return (
+              <tr key={id}>
+                <td>{o.code || id}</td>
+                <td>{fecha ? new Date(fecha).toLocaleString() : "Sin fecha"}</td>
+                <td>
+                  {clienteNombre} {clienteApellido}
+                </td>
+                <td>${Number(total).toLocaleString("es-CL")}</td>
+                <td>
+                  <Link to={`/admin/boletas/${id}`} className="btn btn-primary btn-sm">
+                    Ver boleta
+                  </Link>
+                </td>
+              </tr>
+            );
+          })}
           {orders.length === 0 && (
             <tr><td colSpan="5">Sin órdenes aún.</td></tr>
           )}

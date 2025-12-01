@@ -1,5 +1,6 @@
 // src/pages/Productos.jsx
 import React, { useEffect, useState } from "react";
+import { loadDeleted } from "../utilidades/deletedProductsSession";
 
 const API_URL = "http://52.0.14.78:8080/api/productos";
 
@@ -27,6 +28,23 @@ function mapProducto(p) {
 
 export default function Productos() {
   const [productos, setProductos] = useState([]);
+  const [deletedSet, setDeletedSet] = useState(new Set());
+
+  // Cargar lista de eliminados al montar y escuchar cambios
+  useEffect(() => {
+    setDeletedSet(loadDeleted());
+
+    const handleChange = () => setDeletedSet(loadDeleted());
+    window.addEventListener("sv_deleted_products_change", handleChange);
+    window.addEventListener("storage", (e) => {
+      if (e.key === "sv:admin:deletedProducts") handleChange();
+    });
+
+    return () => {
+      window.removeEventListener("sv_deleted_products_change", handleChange);
+      window.removeEventListener("storage", handleChange);
+    };
+  }, []);
 
   useEffect(() => {
     async function fetchProductos() {
@@ -54,8 +72,8 @@ export default function Productos() {
     fetchProductos();
   }, []);
 
-  // Si después quieres filtros/búsquedas, se aplican sobre `productos`
-  const productosVisibles = productos;
+  // Filtramos los productos que estén en el set de eliminados
+  const productosVisibles = productos.filter(p => !deletedSet.has(p.id));
 
   return (
     <main className="flex-grow-1">

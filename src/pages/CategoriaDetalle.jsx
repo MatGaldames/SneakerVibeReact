@@ -1,6 +1,7 @@
 // src/pages/CategoriaDetalle.jsx
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { loadDeleted } from "../utilidades/deletedProductsSession";
 
 const API_URL = "http://52.0.14.78:8080/api/productos";
 
@@ -32,6 +33,23 @@ export default function CategoriaDetalle() {
   const [productosFiltrados, setProductosFiltrados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deletedSet, setDeletedSet] = useState(new Set());
+
+  // Cargar lista de eliminados al montar y escuchar cambios
+  useEffect(() => {
+    setDeletedSet(loadDeleted());
+
+    const handleChange = () => setDeletedSet(loadDeleted());
+    window.addEventListener("sv_deleted_products_change", handleChange);
+    window.addEventListener("storage", (e) => {
+      if (e.key === "sv:admin:deletedProducts") handleChange();
+    });
+
+    return () => {
+      window.removeEventListener("sv_deleted_products_change", handleChange);
+      window.removeEventListener("storage", handleChange);
+    };
+  }, []);
 
   useEffect(() => {
     async function fetchProductos() {
@@ -101,11 +119,14 @@ export default function CategoriaDetalle() {
     );
   }
 
+  // Filtramos los productos que estén en el set de eliminados
+  const productosVisibles = productosFiltrados.filter(p => !deletedSet.has(p.id));
+
   return (
     <main className="flex-grow-1">
       <div className="container-fluid my-5">
         <div className="row justify-content-around w-100 mx-0">
-          {productosFiltrados.map((p) => (
+          {productosVisibles.map((p) => (
             <div
               key={p.id}
               className="col-12 col-sm-6 col-md-4 col-lg-4 mb-4 d-flex justify-content-center"

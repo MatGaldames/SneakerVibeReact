@@ -31,7 +31,7 @@ export default function Navbar() {
     navigate("/", { replace: true });
   };
 
-  const esAdmin = (usuario?.rol ?? usuario?.role) === "admin";
+  const esAdmin = (usuario?.rol ?? usuario?.role) === "admin" || usuario?.esAdmin === true;
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light px-4">
@@ -64,7 +64,7 @@ export default function Navbar() {
           {esAdmin && (
             <li className="nav-item mx-2">
               <Link className="nav-link fw-semibold text-danger" to="/admin/dashboard">
-                Administrador
+                Panel de Admin
               </Link>
             </li>
           )}

@@ -3,7 +3,7 @@
 
 import { guardaSesion } from "./autenticacion";
 
-const API_URL = "http://18.232.140.10:8080/api/usuarios";
+const API_URL = "http://52.0.14.78:8080/api/usuarios";
 
 export async function registrarUsuarioComun(datos, opciones = {}) {
   const { autoLogin = true } = opciones;

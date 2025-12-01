@@ -1,5 +1,6 @@
 // src/pages/Ofertas.jsx
 import React, { useEffect, useState } from "react";
+import { loadDeleted } from "../utilidades/deletedProductsSession";
 
 const API_URL = "http://52.0.14.78:8080/api/productos";
 
@@ -29,6 +30,23 @@ export default function Ofertas() {
   const [ofertas, setOfertas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deletedSet, setDeletedSet] = useState(new Set());
+
+  // Cargar lista de eliminados al montar y escuchar cambios
+  useEffect(() => {
+    setDeletedSet(loadDeleted());
+
+    const handleChange = () => setDeletedSet(loadDeleted());
+    window.addEventListener("sv_deleted_products_change", handleChange);
+    window.addEventListener("storage", (e) => {
+      if (e.key === "sv:admin:deletedProducts") handleChange();
+    });
+
+    return () => {
+      window.removeEventListener("sv_deleted_products_change", handleChange);
+      window.removeEventListener("storage", handleChange);
+    };
+  }, []);
 
   useEffect(() => {
     async function fetchOfertas() {
@@ -95,12 +113,15 @@ export default function Ofertas() {
     );
   }
 
+  // Filtramos los productos que estén en el set de eliminados
+  const ofertasVisibles = ofertas.filter(p => !deletedSet.has(p.id));
+
   return (
     <main className="flex-grow-1">
       <div className="container-fluid my-5">
         <h2 className="text-center mb-4">Ofertas BLACK FRIDAY</h2>
         <div className="row justify-content-around w-100 mx-0">
-          {ofertas.map((p) => {
+          {ofertasVisibles.map((p) => {
             const ahorro =
               p.precioOferta && p.precio
                 ? Math.round((1 - p.precioOferta / p.precio) * 100)

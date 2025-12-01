@@ -5,6 +5,7 @@ import { clp } from "../assets/hooks/currency.js";
 import { useCarrito } from "../utilidades/useCarrito.js";
 import productos from "../data/productos.js";
 import { saveOrder } from "../utilidades/orderStorage.js";
+import { createPedido } from "../services/pedidoService.js";
 import { useNavigate } from "react-router-dom";
 
 function ValidacionTexto({ error }) {
@@ -125,6 +126,15 @@ export default function Envio() {
 
         // Guarda la orden localmente
         saveOrder(newOrder);
+
+        // Guarda la orden en la BD
+        createPedido(newOrder).then((res) => {
+            if (res) {
+                console.log("Pedido guardado en BD:", res);
+            } else {
+                console.error("No se pudo guardar el pedido en la BD");
+            }
+        });
 
         if (!form.simularRechazo) {
             clear();

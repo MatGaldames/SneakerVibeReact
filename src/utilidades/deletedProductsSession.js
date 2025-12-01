@@ -7,7 +7,7 @@ export const getStableId = (p, fallbackIndex) => p?.id ?? p?._id ?? p?.__id ?? f
 // Cargar el set de eliminados de esta sesión
 export const loadDeleted = () => {
   try {
-    return new Set(JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "[]"));
+    return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
   } catch {
     return new Set();
   }
@@ -17,14 +17,16 @@ export const loadDeleted = () => {
 export const markDeleted = (stableId) => {
   const set = loadDeleted();
   set.add(stableId);
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
+  window.dispatchEvent(new Event("sv_deleted_products_change"));
 };
 
 // Quitar un id del set de eliminados (habilitar)
 export const unmarkDeleted = (stableId) => {
   const set = loadDeleted();
   set.delete(stableId);
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
+  window.dispatchEvent(new Event("sv_deleted_products_change"));
 };
 
 // Helper opcional

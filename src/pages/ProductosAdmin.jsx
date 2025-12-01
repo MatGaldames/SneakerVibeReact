@@ -1,8 +1,7 @@
-// arriba del archivo
 import React, { useState, useEffect } from "react";
 import DashboardSidebar from "../componentes/Dashboard";
-import productosSeed from "../data/productos";
-import { loadDeleted, markDeleted, unmarkDeleted, getStableId } from "../utilidades/deletedProductsSession";
+import { getProductos } from "../services/productoService";
+import { loadDeleted, markDeleted, unmarkDeleted } from "../utilidades/deletedProductsSession";
 
 // ----- helpers -----
 const formatCLP = (v) =>
@@ -14,43 +13,39 @@ const formatCLP = (v) =>
 
 const resolveImgSrc = (path) => {
   if (!path) return "/assets/img/placeholder-product.svg";
-  if (path.startsWith("/")) return path;   // ya está en /public
-  return `/${path.replace(/^\.?\//, "")}`; // vuelve absoluta
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("/")) return path;
+  return `/${path.replace(/^\.?\//, "")}`;
 };
 
 // ----- componente -----
 export default function AdminProductos() {
-  // Set de deshabilitados en sessionStorage
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [deletedSet, setDeletedSet] = useState(loadDeleted());
 
-  // (Opcional) Escucha cambios desde otras pestañas
+  const cargarProductos = async () => {
+    setLoading(true);
+    const data = await getProductos();
+    setProductos(data);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const onStorage = (e) => {
-      if (e.key === "sv:admin:deletedProducts") {
-        setDeletedSet(loadDeleted());
-      }
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    cargarProductos();
   }, []);
 
-  const refreshDeleted = () => setDeletedSet(new Set(loadDeleted()));
-
-  const eliminar = (sid) => {
-    markDeleted(sid);   // marca como deshabilitado
-    refreshDeleted();
+  // Soft Delete (Solo visual/sesión)
+  const eliminar = (id) => {
+    markDeleted(id);
+    setDeletedSet(new Set(loadDeleted()));
   };
 
-  const habilitar = (sid) => {
-    unmarkDeleted(sid); // vuelve a habilitar
-    refreshDeleted();
+  // Restaurar
+  const restaurar = (id) => {
+    unmarkDeleted(id);
+    setDeletedSet(new Set(loadDeleted()));
   };
-
-  // Construye el listado SIN filtrar, marcando cada item con __deleted
-  const listado = (productosSeed || []).map((p, i) => {
-    const sid = getStableId(p, i);
-    return { ...p, __sid: sid, __deleted: deletedSet.has(sid) };
-  });
 
   const active = "productos";
 
@@ -99,96 +94,92 @@ export default function AdminProductos() {
             </a>
           </div>
 
-          {listado.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-5">Cargando productos...</div>
+          ) : productos.length === 0 ? (
             <div className="alert alert-light border text-center">
-              No hay productos.
-              <div className="mt-3">
-                <a href="/admin/agregarProducto" className="btn btn-danger btn-sm neon-btn">
-                  <i className="bi bi-plus-lg me-1" /> Crear el primero
-                </a>
-              </div>
+              No hay productos registrados.
             </div>
           ) : (
-            <ul className="list-unstyled m-0">
-              {listado.map((p) => {
-                const titulo = p.titulo ?? p.nombre ?? "Sin título";
-                const categoria = p.categoria ?? p.category ?? "Sin categoría";
-                const precio = p.precio ?? p.price ?? 0;
-                const src = resolveImgSrc(p.imgSrc ?? p.img ?? p.image ?? p.imagen ?? p.src);
-                const alt = p.altText ?? titulo;
-                const isDeleted = !!p.__deleted;
+            <div className="row g-3">
+              {productos.map((p) => {
+                // Mapeo de datos de la API
+                const variante = (p.variantes && p.variantes[0]) || {};
+                const imgSrc = resolveImgSrc(variante.imgSrc);
+                const precio = variante.precio || 0;
+                const stock = variante.stock || 0;
+                const isDeleted = deletedSet.has(p.id);
 
                 return (
-                  <li key={p.__sid} className="mb-2">
-                    <article
-                      className={`card neon-card border-0 ${isDeleted ? "opacity-50" : ""}`}
-                      title={isDeleted ? "Producto deshabilitado" : undefined}
+                  <div key={p.id} className="col-12 col-sm-6 col-lg-4 col-xl-3">
+                    <article 
+                      className={`card h-100 shadow-sm border-0 neon-card ${isDeleted ? "opacity-50" : ""}`}
                     >
-                      <div className="card-body py-3">
-                        <div className="row align-items-center g-3">
-                          {/* IMG */}
-                          <div className="col-auto">
-                            <img
-                              src={src}
-                              alt={alt}
-                              width="56"
-                              height="56"
-                              className="rounded"
-                              style={{ objectFit: "cover" }}
-                              onError={(e) => (e.currentTarget.src = "/assets/img/placeholder-product.svg")}
-                            />
+                      <div className="position-relative">
+                        <img
+                          src={imgSrc}
+                          className="card-img-top"
+                          alt={p.nombre}
+                          style={{ height: 200, objectFit: "cover" }}
+                        />
+                        <div className="position-absolute top-0 end-0 p-2">
+                          <span className="badge bg-dark bg-opacity-75">ID: {p.id}</span>
+                        </div>
+                        {isDeleted && (
+                          <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-25">
+                            <span className="badge bg-danger fs-6">ELIMINADO</span>
                           </div>
+                        )}
+                      </div>
 
-                          {/* TÍTULO + CATEGORÍA */}
-                          <div className="col">
-                            <div className="d-flex align-items-center gap-2">
-                              <div className="fw-semibold">{titulo}</div>
-                              {isDeleted && (
-                                <span className="badge text-bg-secondary">Deshabilitado</span>
-                              )}
-                            </div>
-                            <small className="text-muted">{categoria}</small>
-                          </div>
-
-                          {/* PRECIO alineado */}
-                          <div className="col-auto d-none d-sm-block">
-                            <div className="fw-bold text-end text-nowrap" style={{ width: 120 }}>
-                              {formatCLP(precio)}
-                            </div>
-                          </div>
-
-                          {/* ACCIÓN */}
-                          <div className="col-auto">
-                            {isDeleted ? (
-                              <button
-                                className="btn btn-outline-success btn-sm"
-                                onClick={() => habilitar(p.__sid)}
-                              >
-                                <i className="bi bi-arrow-counterclockwise me-1" />
-                                Habilitar
-                              </button>
-                            ) : (
-                              <button
-                                className="btn btn-outline-danger btn-sm"
-                                onClick={() => eliminar(p.__sid)}
-                              >
-                                <i className="bi bi-trash me-1" />
-                                Eliminar
-                              </button>
-                            )}
-                          </div>
-
-                          {/* PRECIO móvil */}
-                          <div className="col-12 d-sm-none">
-                            <div className="fw-bold text-end">{formatCLP(precio)}</div>
-                          </div>
+                      <div className="card-body d-flex flex-column">
+                        <h5 className="card-title fw-bold text-truncate" title={p.nombre}>
+                          {p.nombre}
+                        </h5>
+                        <p className="card-text small text-muted mb-2 text-truncate">
+                          {p.marca} - {p.categoria?.nombreCategoria || "Sin categoría"}
+                        </p>
+                        
+                        <div className="mt-auto d-flex align-items-center justify-content-between">
+                          <span className="fw-bold text-danger fs-5">
+                            {formatCLP(precio)}
+                          </span>
+                          <small className="text-muted">Stock: {stock}</small>
                         </div>
                       </div>
+
+                      <div className="card-footer bg-white border-0 pt-0 pb-3 d-flex justify-content-between">
+                        <button
+                          className="btn btn-sm btn-outline-secondary"
+                          title="Editar (Próximamente)"
+                          disabled
+                        >
+                          <i className="bi bi-pencil me-1" /> Editar
+                        </button>
+                        
+                        {isDeleted ? (
+                          <button
+                            className="btn btn-sm btn-outline-success"
+                            onClick={() => restaurar(p.id)}
+                            title="Restaurar producto"
+                          >
+                            <i className="bi bi-arrow-counterclockwise me-1" /> Restaurar
+                          </button>
+                        ) : (
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => eliminar(p.id)}
+                            title="Eliminar producto"
+                          >
+                            <i className="bi bi-trash me-1" /> Eliminar
+                          </button>
+                        )}
+                      </div>
                     </article>
-                  </li>
+                  </div>
                 );
               })}
-            </ul>
+            </div>
           )}
         </div>
       </section>

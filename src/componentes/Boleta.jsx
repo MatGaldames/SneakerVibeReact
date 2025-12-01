@@ -8,10 +8,16 @@ export default function Boleta({ order, onClose }) {
 
   if (!order) return null;
 
-  const c = order.customer ?? {};
-  const d = c.direccion ?? {};
-  const items = order.items ?? [];
-  const t = order.totals ?? { subtotal: 0, descuento: 0, envio: 0, total: 0 };
+  // Adaptar estructura (Envio.jsx vs Legacy)
+  const cliente = order.cliente || order.customer || {};
+  const direccion = typeof cliente.direccion === 'string' 
+    ? { calle: cliente.direccion } 
+    : (cliente.direccion || {});
+  
+  const items = order.items || [];
+  const total = order.total || order.totals?.total || 0;
+  const fecha = order.fecha || order.createdAt;
+  const numero = order.code || order.number || order.id;
 
   const handlePrint = () => {
     // Opción simple: usa window.print() y añade estilos @media print
@@ -31,18 +37,22 @@ export default function Boleta({ order, onClose }) {
       <div className="boleta card shadow-sm">
         <div className="card-header d-flex justify-content-between align-items-center">
           <strong>Boleta</strong>
-          <span>{order.number}</span>
+          <span>{numero}</span>
         </div>
 
         <div className="card-body">
           <div className="mb-3">
             <h5 className="mb-1">Datos del Cliente</h5>
-            <div>{c.nombre} {c.apellido}</div>
-            {c.rut && <div>RUT: {c.rut}</div>}
-            {c.email && <div>Email: {c.email}</div>}
-            {c.telefono && <div>Teléfono: {c.telefono}</div>}
+            <div>{cliente.nombre} {cliente.apellidos || cliente.apellido}</div>
+            {cliente.rut && <div>RUT: {cliente.rut}</div>}
+            {cliente.correo || cliente.email && <div>Email: {cliente.correo || cliente.email}</div>}
+            {cliente.telefono && <div>Teléfono: {cliente.telefono}</div>}
             <div>
-              Dirección: {d.calle} {d.numero}{d.depto ? `, Depto ${d.depto}` : ""}, {d.comuna}, {d.region}
+              Dirección: {direccion.calle} {direccion.numero} {direccion.depto ? `, Depto ${direccion.depto}` : ""}
+              {direccion.comuna ? `, ${direccion.comuna}` : ""}
+              {direccion.region ? `, ${direccion.region}` : ""}
+              {cliente.comuna ? `, ${cliente.comuna}` : ""}
+              {cliente.region ? `, ${cliente.region}` : ""}
             </div>
           </div>
 
@@ -58,31 +68,32 @@ export default function Boleta({ order, onClose }) {
                 </tr>
               </thead>
               <tbody>
-                {items.map((it, idx) => (
-                  <tr key={idx}>
-                    <td>
-                      {it.nombre}
-                      {it.talla ? ` / Talla ${it.talla}` : ""}
-                      {it.color ? ` / ${it.color}` : ""}
-                    </td>
-                    <td>{it.qty}</td>
-                    <td>${Number(it.price).toLocaleString("es-CL")}</td>
-                    <td>${Number(it.price * it.qty).toLocaleString("es-CL")}</td>
-                  </tr>
-                ))}
+                {items.map((it, idx) => {
+                  const nombre = it.titulo || it.nombre || "Producto";
+                  const cantidad = it.cantidad || it.qty || 0;
+                  const precio = it.precio || it.price || 0;
+                  return (
+                    <tr key={idx}>
+                      <td>
+                        {nombre}
+                        {it.talla ? ` / Talla ${it.talla}` : ""}
+                        {it.color ? ` / ${it.color}` : ""}
+                      </td>
+                      <td>{cantidad}</td>
+                      <td>${Number(precio).toLocaleString("es-CL")}</td>
+                      <td>${Number(precio * cantidad).toLocaleString("es-CL")}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
               <tfoot>
-                <tr><th colSpan="3" className="text-end">Subtotal</th><th>${Number(t.subtotal).toLocaleString("es-CL")}</th></tr>
-                <tr><th colSpan="3" className="text-end">Descuento</th><th>-${Number(t.descuento).toLocaleString("es-CL")}</th></tr>
-                <tr><th colSpan="3" className="text-end">Envío</th><th>${Number(t.envio).toLocaleString("es-CL")}</th></tr>
-                <tr><th colSpan="3" className="text-end">TOTAL</th><th>${Number(t.total).toLocaleString("es-CL")}</th></tr>
+                <tr><th colSpan="3" className="text-end">TOTAL</th><th>${Number(total).toLocaleString("es-CL")}</th></tr>
               </tfoot>
             </table>
           </div>
 
           <div className="d-flex justify-content-between">
-            <small>Fecha: {new Date(order.createdAt).toLocaleString()}</small>
-            <small>Pago: {order.payment?.method || "—"} ({order.payment?.status || "—"})</small>
+            <small>Fecha: {fecha ? new Date(fecha).toLocaleString() : "—"}</small>
           </div>
         </div>
 
