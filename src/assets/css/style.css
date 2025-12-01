@@ -201,3 +201,32 @@ a.text-reset:hover {
     0 0 20px rgba(255,0,85,.4),
     0 0 30px rgba(255,0,85,.3);
 }
+
+.sv-toast {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 2000;
+  min-width: 260px;
+  max-width: 320px;
+  animation: sv-fade-slide 2.2s ease-out forwards;
+}
+
+@keyframes sv-fade-slide {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}

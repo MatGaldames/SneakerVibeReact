@@ -23,9 +23,7 @@ function mapProductoFromApi(p = {}) {
         : undefined,
     tallas:
       variantes.length > 0
-        ? variantes
-          .map((det) => det.talla)
-          .filter(Boolean)
+        ? variantes.map((det) => det.talla).filter(Boolean)
         : [],
   };
 }
@@ -40,6 +38,14 @@ export default function ProductDetail() {
   const [masVendidos, setMasVendidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // ⭐ Toast (mensaje animado)
+  const [showToast, setShowToast] = useState(false);
+
+  const mostrarToast = () => {
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2000);
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -181,9 +187,10 @@ export default function ProductDetail() {
               {/* AGREGAR AL CARRITO */}
               <button
                 className="btn btn-danger w-100 mb-3"
-                onClick={() =>
-                  add({ ...producto, precio: precioEfectivo, talla })
-                }
+                onClick={() => {
+                  add({ ...producto, precio: precioEfectivo, talla });
+                  mostrarToast();
+                }}
               >
                 Agregar al carrito
               </button>
@@ -234,6 +241,14 @@ export default function ProductDetail() {
           </div>
         </div>
       </section>
+
+      {/* ⭐ TOAST ANIMADO */}
+      {showToast && (
+        <div className="sv-toast alert alert-success shadow-sm mb-0">
+          <strong>Producto agregado</strong>
+          <div className="small">Se añadió al carrito correctamente.</div>
+        </div>
+      )}
     </main>
   );
 }
