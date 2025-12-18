@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import DashboardSidebar from "../componentes/Dashboard";
-import { getProductos } from "../services/productoService";
+import { getProductos, getProductosMerged } from "../services/productoService";
+import { removeLocalProduct } from "../services/localProducts";
 import { loadDeleted, markDeleted, unmarkDeleted } from "../utilidades/deletedProductsSession";
+import { resolveImgSrc } from "../utilidades/resolveImgSrc";
 
 // ----- helpers -----
 const formatCLP = (v) =>
@@ -11,13 +13,6 @@ const formatCLP = (v) =>
     maximumFractionDigits: 0,
   }).format(Number(v) || 0);
 
-const resolveImgSrc = (path) => {
-  if (!path) return "/assets/img/placeholder-product.svg";
-  if (path.startsWith("http")) return path;
-  if (path.startsWith("/")) return path;
-  return `/${path.replace(/^\.?\//, "")}`;
-};
-
 // ----- componente -----
 export default function AdminProductos() {
   const [productos, setProductos] = useState([]);
@@ -26,7 +21,7 @@ export default function AdminProductos() {
 
   const cargarProductos = async () => {
     setLoading(true);
-    const data = await getProductos();
+    const data = await getProductosMerged(getProductos);
     setProductos(data);
     setLoading(false);
   };
@@ -35,8 +30,13 @@ export default function AdminProductos() {
     cargarProductos();
   }, []);
 
-  // Soft Delete (Solo visual/sesión)
+  // Soft Delete (Solo visual/sesión) o Delete Real (Local)
   const eliminar = (id) => {
+    if (String(id).startsWith("local-")) {
+      removeLocalProduct(id);
+      cargarProductos();
+      return;
+    }
     markDeleted(id);
     setDeletedSet(new Set(loadDeleted()));
   };
@@ -116,12 +116,15 @@ export default function AdminProductos() {
                       className={`card h-100 shadow-sm border-0 neon-card ${isDeleted ? "opacity-50" : ""}`}
                     >
                       <div className="position-relative">
-                        <img
-                          src={imgSrc}
-                          className="card-img-top"
-                          alt={p.nombre}
-                          style={{ height: 200, objectFit: "cover" }}
-                        />
+                        <div className="product-image-wrapper">
+                          <img
+                            src={imgSrc}
+                            className="card-img-top product-image"
+                            alt={variante.altText || p.nombre}
+                            style={{ height: 200, objectFit: "cover" }}
+                            onError={(e) => { e.currentTarget.src = "/assets/img/placeholder-product.png"; }}
+                          />
+                        </div>
                         <div className="position-absolute top-0 end-0 p-2">
                           <span className="badge bg-dark bg-opacity-75">ID: {p.id}</span>
                         </div>

@@ -1,7 +1,17 @@
 // src/paginas/AgregarProductos.jsx
 import React, { useState, useMemo } from "react";
-import { addExtraProduct } from "../utilidades/extraProducts";
-import { buildProductFromForm, CATEGORY_SIZES, makeImgSrc } from "../utilidades/productFactory";
+import { addLocalProduct } from "../services/localProducts";
+import { CATEGORY_SIZES } from "../utilidades/productFactory";
+import DashboardSidebar from "../componentes/Dashboard";
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = (e) => reject(e);
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function AgregarProductos({ bgUrl = "/assets/img/auth-bg.jpg" }) {
   const [form, setForm] = useState({
@@ -9,10 +19,12 @@ export default function AgregarProductos({ bgUrl = "/assets/img/auth-bg.jpg" }) 
     descripcion: "",
     precio: "",
     categoria: "zapatillas",
-    imagen: "", // nombre o ruta del archivo
+    imagen: null, // Objeto File
   });
   const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const onChange = (e) => {
     const { id, value } = e.target;
@@ -22,69 +34,104 @@ export default function AgregarProductos({ bgUrl = "/assets/img/auth-bg.jpg" }) 
   const onFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) {
-      setForm((prev) => ({ ...prev, imagen: "" }));
+      setForm((prev) => ({ ...prev, imagen: null }));
       setPreviewUrl(null);
       return;
     }
-    // Guardamos el nombre del archivo para construir imgSrc = /assets/img/<archivo>
-    setForm((prev) => ({ ...prev, imagen: file.name }));
-    // Vista previa local (solo UI)
+    setForm((prev) => ({ ...prev, imagen: file }));
     setPreviewUrl(URL.createObjectURL(file));
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    // Construye el producto con campos automáticos (id, href, imgSrc, altText, tallas)
-    const producto = buildProductFromForm({
-      titulo: form.titulo,
-      descripcion: form.descripcion,
-      precio: form.precio,
-      categoria: form.categoria,
-      imagen: form.imagen,
-      // precioOferta se omite => quedará null automáticamente en buildProductFromForm
-    });
+    setMsg("");
+    setError("");
+    setLoading(true);
 
-    addExtraProduct(producto);
+    try {
+      // 1. Procesar imagen (DataURL para local)
+      let imgSrc = "/assets/img/placeholder-product.png";
+      if (form.imagen) {
+        try {
+          if (form.imagen instanceof File) {
+            imgSrc = await fileToDataUrl(form.imagen);
+          }
+        } catch (err) {
+          console.error("Error leyendo archivo", err);
+        }
+      }
 
-    setMsg(`Producto "${producto.titulo}" agregado ✅`);
-    // Resetea, manteniendo la categoría para velocidad de carga masiva
-    setForm({
-      titulo: "",
-      descripcion: "",
-      precio: "",
-      categoria: form.categoria,
-      imagen: "",
-    });
-    setPreviewUrl(null);
+      // 2. Construir objeto local
+      const idLocal = "local-" + Date.now();
+      const productoLocal = {
+        id: idLocal,
+        nombre: form.titulo,
+        descripcion: form.descripcion,
+        marca: "SneakerVibe",
+        categoria: { nombreCategoria: form.categoria },
+        variantes: [
+          {
+            id: "local-var-" + Date.now(),
+            color: "default",
+            talla: "38", // Valor por defecto
+            precio: Number(form.precio),
+            stock: 10,
+            imgSrc: imgSrc,
+            href: "#",
+            altText: form.titulo,
+            precioOferta: null,
+          },
+        ],
+        __local: true,
+      };
+
+      // 3. Guardar localmente
+      addLocalProduct(productoLocal);
+
+      setMsg(`Producto "${form.titulo}" agregado exitosamente.`);
+      setForm({
+        titulo: "",
+        descripcion: "",
+        precio: "",
+        categoria: form.categoria,
+        imagen: null,
+      });
+      setPreviewUrl(null);
+    } catch (err) {
+      console.error(err);
+      setError("Ocurrió un error inesperado.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Vista previa de tallas según categoría
   const tallasPreview = useMemo(() => CATEGORY_SIZES[form.categoria] || [], [form.categoria]);
-  const computedImgSrc = useMemo(() => makeImgSrc(form.imagen), [form.imagen]);
 
   return (
-    <main
-      className="flex-grow-1 bg-light min-vh-100 py-5"
-      style={{
-        minHeight: "100vh",
-        backgroundImage: `url('${bgUrl}')`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        position: "relative",
-      }}
-    >
+    <main className="min-vh-100 bg-light d-flex flex-column flex-md-row">
+       <DashboardSidebar active="agregarProducto" />
+       
+       <section className="flex-grow-1 p-4" style={{
+          backgroundImage: `url('${bgUrl}')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+       }}>
       <div className="container">
-        <div className="text-center mb-5">
+        <div className="text-center mb-5 bg-white bg-opacity-75 p-3 rounded">
           <h2 className="fw-bold text-dark neon-text">Agregar producto</h2>
-          <p className="text-muted">
-            Completa los campos para agregar un nuevo producto a SneakerVibe
+          <p className="text-muted mb-0">
+            Completa los campos para agregar un nuevo producto a la Base de Datos
           </p>
         </div>
 
         <div className="row justify-content-center">
           <div className="col-12 col-md-8 col-lg-6">
             <div className="card neon-card p-4 shadow-lg border-0 rounded-3">
+              {msg && <div className="alert alert-success">{msg}</div>}
+              {error && <div className="alert alert-danger">{error}</div>}
+              
               <form className="d-flex flex-column gap-3" onSubmit={onSubmit}>
                 {/* Título (Nombre) */}
                 <div>
@@ -202,17 +249,16 @@ export default function AgregarProductos({ bgUrl = "/assets/img/auth-bg.jpg" }) 
 
                 {/* Botón */}
                 <div className="text-center mt-2">
-                  <button type="submit" className="btn btn-danger px-4 neon-btn">
-                    Agregar producto
+                  <button type="submit" className="btn btn-danger px-4 neon-btn" disabled={loading}>
+                    {loading ? "Guardando..." : "Agregar producto"}
                   </button>
                 </div>
-
-                {msg && <div className="alert alert-success mt-2 mb-0">{msg}</div>}
               </form>
             </div>
           </div>
         </div>
       </div>
+       </section>
     </main>
   );
 }

@@ -1,6 +1,8 @@
 // src/pages/Productos.jsx
 import React, { useEffect, useState } from "react";
 import { loadDeleted } from "../utilidades/deletedProductsSession";
+import { getProductos, getProductosMerged } from "../services/productoService";
+import { resolveImgSrc } from "../utilidades/resolveImgSrc";
 
 const API_URL = "http://52.0.14.78:8080/api/productos";
 
@@ -21,7 +23,7 @@ function mapProducto(p) {
     descripcion: p.descripcion ?? p.marca ?? "",
     precio,
     precioOferta: precioOfertaRaw, // <-- la usamos solo para filtrar
-    imgSrc: v.imgSrc ?? "/assets/img/placeholder-product.svg",
+    imgSrc: resolveImgSrc(v.imgSrc),
     altText: v.altText ?? (p.nombre || "Producto SneakerVibe"),
   };
 }
@@ -49,12 +51,7 @@ export default function Productos() {
   useEffect(() => {
     async function fetchProductos() {
       try {
-        const res = await fetch(API_URL);
-        if (!res.ok) {
-          throw new Error(`Error HTTP ${res.status}`);
-        }
-
-        const data = await res.json();
+        const data = await getProductosMerged(getProductos);
         const mapeados = Array.isArray(data) ? data.map(mapProducto) : [];
 
         // 🔥 Solo productos SIN oferta (precioOferta === null)
@@ -89,6 +86,7 @@ export default function Productos() {
                   src={p.imgSrc}
                   className="card-img-top rounded"
                   alt={p.altText}
+                  onError={(e) => { e.currentTarget.src = "/assets/img/placeholder-product.png"; }}
                 />
                 <div className="card-body d-flex flex-column justify-content-between">
                   <div>

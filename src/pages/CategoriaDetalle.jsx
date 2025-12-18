@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { loadDeleted } from "../utilidades/deletedProductsSession";
+import { getProductos, getProductosMerged } from "../services/productoService";
 
 const API_URL = "http://52.0.14.78:8080/api/productos";
 
@@ -57,12 +58,7 @@ export default function CategoriaDetalle() {
         setLoading(true);
         setError(null);
 
-        const res = await fetch(API_URL);
-        if (!res.ok) {
-          throw new Error(`Error HTTP ${res.status}`);
-        }
-
-        const data = await res.json();
+        const data = await getProductosMerged(getProductos);
         const normalizados = Array.isArray(data)
           ? data.map(mapProductoFromApi)
           : [];

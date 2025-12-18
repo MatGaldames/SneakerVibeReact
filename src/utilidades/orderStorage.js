@@ -50,26 +50,28 @@ export function getLastOrder() {
 }
 
 function normalizeOrder(o) {
-  // Orden completa
+  // Caso 1: Estructura nueva (Envio.jsx)
+  if (o && o.cliente && o.items && (o.total !== undefined)) {
+    return { ...o, id: o.id || o.code || crypto.randomUUID() };
+  }
+
+  // Caso 2: Estructura antigua (Legacy)
   if (o && o.customer && o.items && o.totals) {
-    // Garantiza id estable
     return { id: o.id ?? o.number ?? crypto.randomUUID(), ...o };
   }
 
-  // Legacy (string o { number })
+  // Fallback: Legacy string o incompleto
   const number = typeof o === "string" ? o : (o?.number ?? "SIN-NUMERO");
   return {
-    id: `LEGACY-${number}`,              // ID estable basado en el número
+    id: `LEGACY-${number}`,
     number,
     createdAt: new Date().toISOString(),
-    customer: {
-      nombre: "(sin nombre)", apellido: "", rut: "", email: "", telefono: "",
-      direccion: { calle: "", numero: "", depto: "", comuna: "", region: "" },
+    cliente: { // Normalizamos a 'cliente' para que Boleta.jsx funcione
+      nombre: "(sin nombre)", apellidos: "", correo: "",
+      direccion: "", comuna: "", region: ""
     },
     items: [],
-    totals: { subtotal: 0, descuento: 0, envio: 0, total: 0 },
-    payment: { method: "", status: "pendiente" },
-    shipping: { status: "pendiente" },
+    total: 0,
     _legacy: true,
   };
 }

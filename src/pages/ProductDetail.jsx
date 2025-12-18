@@ -33,6 +33,7 @@ function mapProductoFromApi(p = {}) {
 export default function ProductDetail() {
   const { add } = useCarrito();
   const [talla, setTalla] = useState(null);
+  const [isAdding, setIsAdding] = useState(false);
   const location = useLocation();
   const productId = new URLSearchParams(location.search).get("id")?.trim();
 
@@ -40,6 +41,18 @@ export default function ProductDetail() {
   const [masVendidos, setMasVendidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const handleAddToCart = () => {
+    // Precio efectivo ya calculado en render, pero lo recalculamos o pasamos
+    const precioEfectivo =
+      producto.precioOferta && producto.precioOferta < producto.precio
+        ? producto.precioOferta
+        : producto.precio;
+
+    add({ ...producto, precio: precioEfectivo, talla });
+    setIsAdding(true);
+    setTimeout(() => setIsAdding(false), 1500);
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -180,12 +193,19 @@ export default function ProductDetail() {
 
               {/* AGREGAR AL CARRITO */}
               <button
-                className="btn btn-danger w-100 mb-3"
-                onClick={() =>
-                  add({ ...producto, precio: precioEfectivo, talla })
-                }
+                className={`btn w-100 mb-3 ${isAdding ? "btn-success" : "btn-danger"}`}
+                onClick={handleAddToCart}
+                disabled={isAdding}
+                style={{ transition: "all 0.3s ease" }}
               >
-                Agregar al carrito
+                {isAdding ? (
+                  <>
+                    <i className="bi bi-check-circle-fill me-2 animate__animated animate__bounceIn"></i>
+                    ¡Agregado!
+                  </>
+                ) : (
+                  "Agregar al carrito"
+                )}
               </button>
             </div>
           </div>

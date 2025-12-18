@@ -15,9 +15,9 @@ export default function DashboardSidebar({ active = "dashboard" }) {
           </a>
         </li>
         <li className="nav-item">
-          <a href="/admin/reportes" className={itemClass("reportes")}>
-            <i className="bi bi-graph-up-arrow" />
-            <span className="ms-2">Reportes</span>
+          <a href="/admin/agregarProducto" className={itemClass("agregarProducto")}>
+            <i className="bi bi-plus-circle" />
+            <span className="ms-2">Agregar Producto</span>
           </a>
         </li>
         <li className="nav-item">

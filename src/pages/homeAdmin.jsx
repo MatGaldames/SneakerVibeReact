@@ -93,7 +93,7 @@ export default function HomeAdmin() {
               { icon: "bi-people",      value: nf.format(counts.usuarios),  label: "Usuarios",  href: "/admin/usuarios"  },
               { icon: "bi-receipt",     value: nf.format(counts.pedidos),   label: "Pedidos",   href: "/admin/ordenes"   },
               { icon: "bi-bag",         value: nf.format(counts.productos), label: "Productos", href: "/admin/productos" },
-              { icon: "bi-info-square", value: nf.format(counts.reportes),  label: "Reportes",  href: "/admin/reportes"  },
+              { icon: "bi-plus-circle", value: "+",                     label: "Agregar",   href: "/admin/agregarProducto" },
             ].map((k, i) => (
               <div className="col-12 col-sm-6 col-lg-3" key={i}>
                 <div className="card h-100 border-0 text-center neon-card">
